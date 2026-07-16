@@ -35,18 +35,29 @@ Ubuntu 22.04 LTS 환경 내에서 아래 명령을 순서대로 실행합니다:
    ```
 
 ### Gazebo 시뮬레이션 및 센서 데이터 검증
+
+#### **[선택 가능 가상 로봇 모델 (구동 방식)]**
+시뮬레이션 구동 시 설정할 수 있는 `LINOROBOT2_BASE` 환경 변수의 옵션은 다음과 같습니다:
+1. **`2wd`**: 2륜 차동 구동 방식 (기본값)
+2. **`4wd`**: 4륜 구동 방식
+3. **`mecanum`**: 전방향 이동이 가능한 메카넘 휠 방식
+4. **`turtlebot`**: 터틀봇 기반 구조
+5. **`vattenkar`**: 아커만 조향(자동차 형태) 등 특수 구조 (승용차 모형 검증을 위해 본 프로젝트에서 사용)
+
+---
+
 1. **시뮬레이션 구동:**
    - Gazebo에서 `linorobot2` 로봇과 월드를 띄웁니다.
-   - 예시 실행 명령어 (로봇 유형에 따라 다름, 4wd/2wd 등 설정 필요):
+   - 승용차 형태의 아커만 조향 모델인 `vattenkar`를 사용해 시뮬레이션을 시작합니다:
      ```bash
-     export LINOROBOT2_BASE=2wd
+     export LINOROBOT2_BASE=vattenkar
      ros2 launch linorobot2_gazebo gazebo.launch.py
      ```
 2. **센서 토픽 모니터링:**
    - 터미널을 새로 열어 `/scan` 및 `/camera/image_raw` 등의 토픽이 정상 수신되는지 확인합니다:
      ```bash
      ros2 topic hz /scan
-     ros2 topic hz /camera/image_raw
+     ros2 topic hz /camera/color/image_raw
      ```
 3. **키보드 수동 주행 및 오도메트리 검증:**
    - `teleop_twist_keyboard`를 실행해 차량을 움직이며 `/odom` 데이터 변화를 모니터링합니다:
