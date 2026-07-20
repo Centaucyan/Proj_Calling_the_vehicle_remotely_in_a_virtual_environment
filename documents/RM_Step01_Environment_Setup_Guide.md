@@ -8,7 +8,7 @@
 이 단계에서는 소스 코드 파일의 직접적인 변경보다는 개발 환경 설치 및 검증 명령어 실행이 중심입니다.
 
 ### [ROS2 Workspace]
-#### [MODIFY] [package.xml](file:///home/USER/USER_ws/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws/src/linorobot2/linorobot2_gazebo/package.xml)
+#### [MODIFY] [package.xml](file:///wsl.localhost/Ubuntu-22.04/home/tae/Tae_ws/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws/src/linorobot2/linorobot2_gazebo/package.xml)
 - 이미 `python3-collada` 및 `python3-opencv` 의존성이 추가되어 있는 것을 확인했습니다. 추가적인 수정은 필요하지 않습니다.
 
 ---
@@ -24,7 +24,7 @@ Ubuntu 22.04 LTS 환경 내에서 아래 명령을 순서대로 실행합니다:
    ```
 2. **의존성(rosdep) 설치:**
    ```bash
-   cd ~/USER_ws/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
+   cd ~/Tae_ws/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
    rosdep update
    rosdep install --from-path src --ignore-src -y --skip-keys microxrcedds_agent --skip-keys micro_ros_agent --skip-keys python3-opencv-contrib-python --skip-keys python3-pycollada
    ```
