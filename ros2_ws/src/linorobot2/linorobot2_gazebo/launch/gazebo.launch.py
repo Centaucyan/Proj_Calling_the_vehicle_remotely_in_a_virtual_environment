@@ -31,7 +31,9 @@ def generate_launch_description():
     )
 
     world_path = PathJoinSubstitution(
-        [FindPackageShare("linorobot2_gazebo"), "worlds", "playground.world"]
+        # [FindPackageShare("linorobot2_gazebo"), "worlds", "playground.world"]
+        # [FindPackageShare("linorobot2_gazebo"), "worlds", "gas_station.world"]
+        [FindPackageShare("linorobot2_gazebo"), "worlds", "default.world"]
     )
 
     robot_base = os.getenv('LINOROBOT2_BASE')

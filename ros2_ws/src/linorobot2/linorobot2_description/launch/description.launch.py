@@ -19,6 +19,7 @@ from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitut
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -75,7 +76,8 @@ def generate_launch_description():
             parameters=[
                 {
                     'use_sim_time': LaunchConfiguration('use_sim_time'),
-                    'robot_description': Command(['xacro ', LaunchConfiguration('urdf')])
+                    # 'robot_description': Command(['xacro ', LaunchConfiguration('urdf')])
+                    'robot_description': ParameterValue(Command(['xacro ', LaunchConfiguration('urdf')]), value_type=str)
                 }
             ]
         ),

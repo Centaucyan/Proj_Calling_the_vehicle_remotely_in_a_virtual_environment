@@ -15,7 +15,7 @@
   - `teleop_twist_keyboard`를 이용한 수동 동작 및 오도메트리(`/odom`) 데이터 정밀도 테스트
 * **검증 방법:** RViz2를 띄워 LiDAR 센서 포인트와 카메라 화면이 깨지지 않고 딜레이 없이 시각화되는지 확인
 
-### 2단계: 아커만 조향(Ackermann Steering) 4륜 로봇 모델 구축 및 조향/구동 검증 [신규 반영]
+### 2단계: 아커만 조향(Ackermann Steering) 4륜 로봇 모델 구축 및 조향/구동 검증
 * **목표:** 기존 차동 구동(Diff Drive) 방식 대신 실제 승용차 형태의 4륜 아커만 조향 로봇 모델(`ackermann.urdf.xacro`) 구축
 * **세부 태스크:**
   - `ackermann_drive.urdf.xacro` 컨트롤러 파일 신규 작성 (전륜 조향 + 후륜 구동 플러그인 연동)
