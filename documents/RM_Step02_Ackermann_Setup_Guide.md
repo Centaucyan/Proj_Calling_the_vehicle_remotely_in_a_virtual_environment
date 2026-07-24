@@ -38,11 +38,9 @@
         <left_steering_joint>front_left_steer_joint</left_steering_joint>
         <right_steering_joint>front_right_steer_joint</right_steering_joint>
 
-        <!-- 필수 구동 바퀴 조인트 4개 -->
-        <front_left_joint>front_left_wheel_joint</front_left_joint>
-        <front_right_joint>front_right_wheel_joint</front_right_joint>
-        <rear_left_joint>rear_left_wheel_joint</rear_left_joint>
-        <rear_right_joint>rear_right_wheel_joint</rear_right_joint>
+        <!-- 필수 구동 바퀴 조인트 2개 -->
+        <left_joint>rear_left_wheel_joint</left_joint>
+        <right_joint>rear_right_wheel_joint</right_joint>
 
         <!-- 제원 및 구동 토크 파라미터 -->
         <max_steer>${max_steer_angle}</max_steer>
@@ -89,8 +87,8 @@
   <xacro:property name="wheel_radius" value="0.08" />
   <xacro:property name="wheel_width" value="0.04" />
   <xacro:property name="wheel_pos_x" value="0.18" />  <!-- 휠베이스(전장) 오프셋 -->
-  <xacro:property name="wheel_pos_y" value="0.16" />  <!-- 윤거(트레드) 오프셋 -->
-  <xacro:property name="wheel_pos_z" value="-0.02" />
+  <xacro:property name="wheel_pos_y" value="0.18" />  <!-- 윤거(트레드) 오프셋 -->
+  <xacro:property name="wheel_pos_z" value="-0.05" />
   <xacro:property name="wheel_mass" value="0.5" />
   <xacro:property name="max_steer_angle" value="0.523599" /> <!-- 최대 조향각 약 30도 -->
 
@@ -160,12 +158,6 @@
           <color rgba="0.1 0.1 0.1 1.0"/>
         </material>
       </visual>
-      <collision>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <box size="0.02 0.02 0.02"/>
-        </geometry>
-      </collision>
       <inertial>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <mass value="0.1"/>
@@ -209,13 +201,7 @@
     </link>
 
     <gazebo reference="${side}_wheel_link">
-      <visual>
-        <material>
-          <ambient>0.1764 0.4588 0.8509 1.0</ambient>
-          <diffuse>0.1764 0.4588 0.8509 1.0</diffuse>
-          <specular>0.1764 0.4588 0.8509 1.0</specular>
-        </material>
-      </visual>
+      <material>Gazebo/Blue</material>
       <mu1>100.0</mu1>
       <mu2>100.0</mu2>
       <kp>10000000.0</kp>
@@ -247,6 +233,18 @@
     wheel_separation="${wheel_pos_y * 2}" 
     max_steer_angle="${max_steer_angle}" 
   />
+
+  <gazebo>
+    <plugin name="gazebo_ros_joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+      <update_rate>30</update_rate>
+      <joint_name>front_left_steer_joint</joint_name>
+      <joint_name>front_right_steer_joint</joint_name>
+      <joint_name>front_left_wheel_joint</joint_name>
+      <joint_name>front_right_wheel_joint</joint_name>
+      <joint_name>rear_left_wheel_joint</joint_name>
+      <joint_name>rear_right_wheel_joint</joint_name>
+    </plugin>
+  </gazebo>
 </robot>
 ```
 
