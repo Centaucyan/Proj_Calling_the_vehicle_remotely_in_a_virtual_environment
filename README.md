@@ -37,7 +37,10 @@ git submodule update --init --recursive
 ---
 
 ## 4. Reference
-* **git repository:** https://github.com/agilexrobotics/hunter_ros2.git
+* **git repository:** 
+  * https://github.com/agilexrobotics/hunter_ros2.git
+  * https://github.com/agilexrobotics/ugv_sdk.git
+  * https://github.com/agilexrobotics/ugv_gazebo_sim.git
 ---
 
 ## 5. Pre-installation
