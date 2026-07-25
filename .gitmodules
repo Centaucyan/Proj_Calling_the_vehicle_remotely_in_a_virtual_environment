@@ -1,7 +1,3 @@
 [submodule "ros2_ws/src/ugv_sdk"]
 	path = ros2_ws/src/ugv_sdk
 	url = https://github.com/agilexrobotics/ugv_sdk.git
-[submodule "ros2_ws/src/hunter_robot"]
-	path = ros2_ws/src/hunter_robot
-	url = https://github.com/LCAS/hunter_robot.git
-	branch = humble_dev

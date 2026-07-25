@@ -41,19 +41,22 @@ sudo apt install -y \
   ros-humble-xacro
 ```
 
-### 3.2. [Step 1.2] AgileX Hunter ROS2 시뮬레이션 및 SDK 서브모듈(Submodule) 추가 (`ros2_ws/src`)
-`ros2_ws/src` 디렉터리로 이동하여 ROS2 Humble을 정식 지원하는 Hunter 통합 시뮬레이션 패키지(`hunter_robot`, `humble_dev` 브랜치)와 C++ 빌드 필수 의존성 SDK(`ugv_sdk`)를 Git 서브모듈(Submodule)로 추가합니다.
+### 3.2. [Step 1.2] AgileX Hunter ROS2 시뮬레이션 패키지 클론 및 SDK 서브모듈(Submodule) 추가 (`ros2_ws/src`)
+`ros2_ws/src` 디렉터리로 이동하여 ROS2 Humble을 정식 지원하는 Hunter 통합 시뮬레이션 패키지(`hunter_robot`, `humble_dev` 브랜치)를 클론하고, 내부 `.git`/`.github` 폴더를 제거하여 프로젝트 메인 패키지화합니다. 이후 C++ 빌드 필수 의존성 SDK(`ugv_sdk`)를 Git 서브모듈(Submodule)로 추가합니다.
 
 ```bash
 cd ~/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws/src
 
-# 1. ROS2 Humble 지원 Hunter 통합 시뮬레이션 패키지 (humble_dev 브랜치) 서브모듈 추가
-git submodule add -b humble_dev https://github.com/LCAS/hunter_robot.git
+# 1. ROS2 Humble 지원 Hunter 통합 시뮬레이션 패키지 (humble_dev 브랜치) 클론
+git clone -b humble_dev https://github.com/LCAS/hunter_robot.git
 
-# 2. hunter_base 빌드 필수 C++ SDK (ugv_sdk) 서브모듈 추가
+# 2. hunter_robot 내부 Git 추적 (.git) 및 CI 시스템 (.github) 폴더 삭제 (프로젝트 메인 패키지화)
+rm -rf hunter_robot/.git hunter_robot/.github
+
+# 3. hunter_base 빌드 필수 C++ SDK (ugv_sdk) 서브모듈 추가
 git submodule add https://github.com/agilexrobotics/ugv_sdk.git
 
-# 3. 서브모듈 최신 상태 동기화 및 내부에 연결된 서브모듈 초기화
+# 4. 서브모듈 최신 상태 동기화 및 내부에 연결된 서브모듈 초기화
 git submodule update --init --recursive
 ```
 > **참고:** `hunter_robot` 저장소에는 ROS2 Humble 환경에 호환되는 Gazebo 시뮬레이션(`hunter_gazebo`), 3D URDF 차체 모델(`hunter_description`), 컨트롤러(`hunter_control`), 커스텀 메시지(`hunter_msgs`), 베이스(`hunter_base`)가 통합 수록되어 있습니다.
@@ -101,10 +104,10 @@ ros2 topic echo /odom
 
 | 번호 | 검증 항목 | 검증 방법 및 기준 | 통과 여부 |
 |:---:|:---|:---|:---:|
-| 1 | **로봇 스폰** | Gazebo 화면 상에 AgileX Hunter 차체와 4개 바퀴가 왜곡 없이 정상 표시됨 | [ ] |
-| 2 | **키보드 조종** | `teleop_twist_keyboard` 키 입력 시 차량이 직진 및 곡선 조향 구동함 | [ ] |
-| 3 | **/odom 토픽** | 차량 이동 시 `/odom` 데이터의 position/orientation 값이 실시간 업데이트됨 | [ ] |
-| 4 | **/tf 좌표계** | `ros2 run tf2_tools view_frames` 실행 시 `odom` -> `base_link` 트리가 올바르게 형성됨 | [ ] |
+| 1 | **로봇 스폰** | Gazebo 화면 상에 AgileX Hunter 차체와 4개 바퀴가 왜곡 없이 정상 표시됨 | [x] |
+| 2 | **키보드 조종** | `teleop_twist_keyboard` 키 입력 시 차량이 직진 및 곡선 조향 구동함 | [x] |
+| 3 | **/odom 토픽** | 차량 이동 시 `/odom` 데이터의 position/orientation 값이 실시간 업데이트됨 | [x] |
+| 4 | **/tf 좌표계** | `ros2 run tf2_tools view_frames` 실행 시 `odom` -> `base_link` 트리가 올바르게 형성됨 | [x] |
 
 ---
 
@@ -117,3 +120,11 @@ ros2 topic echo /odom
 * **문제 2: `colcon build` 시 빌드 실패 또는 패키지 누락 오류 발생**
   - **원인:** ROS2 컨트롤러 관련 빌드 필수 라이브러리 누락
   - **해결:** `rosdep install --from-paths src --ignore-src -r -y --skip-keys "ugv_sdk catkin"` 재실행 및 `sudo apt install ros-humble-ros2-control ros-humble-ros2-controllers` 확인
+
+* **문제 3: 키보드 제어 명령이 작동하지 않고 `/odom` 토픽 조회가 안 되는 경우**
+  - **원인:** Gazebo `diff_drive_controller`가 기본적으로 `/diff_drive_controller/cmd_vel_unstamped` 및 `/diff_drive_controller/odom` 경로를 사용하여, `teleop_twist_keyboard`의 기본 `/cmd_vel` 토픽과 이름 불일치 발생
+  - **해결:** `ros2_control.xacro` 내 Gazebo 플러그인 항목에 `<ros><remapping>` 태그를 추가하여 `/cmd_vel` 및 `/odom` 표준 이름으로 연동
+
+* **문제 4: 주행 시 바퀴가 제자리에서 회전하지 않고 위아래로 덜컹거리며 편심 회전(캠 운동)하는 현상**
+  - **원인:** `wheel.urdf.xacro` visual 메쉬에 Z축 오프셋 `<origin xyz="0 0 -0.06" rpy="0 0 0" />`이 들어가 있어, Y축 회전 관절 대비 Z축 -6cm 유격으로 인해 최고/최저 12cm의 원 운동(Orbit) 발생
+  - **해결:** `wheel.urdf.xacro` 파일의 visual origin 오프셋을 `<origin xyz="0 0 0" rpy="0 0 0" />`으로 수정하여 회전축 수직 유격 제거
