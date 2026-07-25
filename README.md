@@ -11,28 +11,39 @@
 * **Visualization Tool:** RViz2
 ---
 
-## 3. Reference
+## 3. 저장소 클론 및 서브모듈(Submodule) 다운로드 가이드
+
+다른 PC나 새로운 개발 환경에서 이 저장소를 클론할 때 외부 의존성 서브모듈(`ros2_ws/src/hunter_ros2` 등)을 함께 내려받는 2가지 방법입니다.
+
+### 3.1. [방법 1] 저장소 클론 시 서브모듈 한 번에 내려받기 (추천 🌟)
+`--recurse-submodules` 옵션을 사용하면 메인 저장소와 연결된 모든 서브모듈을 한 번에 자동으로 클론합니다.
+
+```bash
+git clone --recurse-submodules https://github.com/Centaucyan/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment.git
+cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment
+```
+
+### 3.2. [방법 2] 일반 `git clone` 후 서브모듈 별도 동기화하기
+이미 `git clone`을 실행했거나 서브모듈이 다운로드되지 않아 폴더가 비어있는 경우 서브모듈을 초기화하고 수동으로 내려받습니다.
+
+```bash
+# 1. 메인 저장소 클론 및 이동
+git clone https://github.com/Centaucyan/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment.git
+cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment
+
+# 2. 서브모듈 초기화 및 동기화 다운로드
+git submodule update --init --recursive
+```
+---
+
+## 4. Reference
 * **git repository:** https://github.com/linorobot/linorobot2
 ---
 
-## 4. Pre-installation
-* $ sudo apt update
-* $ sudo apt upgrade 
-* $ sudo apt install python3-pip
-### 4.1. linorobot2
-* $ mkdir -p ros2_ws/src/
-* $ cd ros2_ws/src/
-* $ git clone -b $ROS_DISTRO https://github.com/linorobot/linorobot2
-* **[Note]** Add the following code to the 'linorobot2/linorobot2_gazebo/package.xml' file:
-    * <exec_depend>python3-collada</exec_depend>
-    * <exec_depend>python3-opencv</exec_depend>
-* $ cd ..
-* $ rosdep update && rosdep install --from-path src --ignore-src -y --skip-keys microxrcedds_agent --skip-keys micro_ros_agent --skip-keys python3-opencv-contrib-python --skip-keys python3-pycollada
-* $ colcon build
-* $ source install/setup.bash
-* $ rm -rf ros2_ws/src/linorobot2/.git
+## 5. Pre-installation
+* -
 ---
 
-## 5. ROS2 노드 구성도 (아키텍처)
+## 6. ROS2 노드 구성도 (아키텍처)
 ![Node Architecture](./documents/images/ROS2_node_structure.png)
 ---

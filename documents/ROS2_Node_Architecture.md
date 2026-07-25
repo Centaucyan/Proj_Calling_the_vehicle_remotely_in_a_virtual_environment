@@ -80,3 +80,14 @@
 * **주요 통신:**
   * **Subscribe:** `/goal_pose` (`geometry_msgs/msg/PoseStamped` -> 목적지 수신)
   * **Publish:** `/cmd_vel` (`geometry_msgs/msg/Twist` -> Gazebo 로봇에 전달할 일반 주행 명령)
+
+### ⑧ `Gazebo Virtual Robot Simulation Node` (Gazebo 3D Simulator)
+* **역할:** 3D 가상 시뮬레이션 환경 내 모형 차량 물리 모델(URDF)을 스폰하여 3D-LiDAR 및 Vision 카메라 센서 데이터를 발행하고, 전달받은 제어 명령(`cmd_vel`)에 따라 구동합니다.
+* **주요 통신:**
+  * **Publish:**
+    * `/scan` (`sensor_msgs/msg/LaserScan` 또는 `PointCloud2` -> 3D-LiDAR 데이터)
+    * `/camera/image_raw` (`sensor_msgs/msg/Image` -> 카메라 영상 데이터)
+    * `/odom` (`nav_msgs/msg/Odometry` -> 오도메트리 데이터)
+    * `/tf` (`tf2_msgs/msg/TFMessage` -> 좌표계 변환 데이터)
+  * **Subscribe:**
+    * `/cmd_vel` (`geometry_msgs/msg/Twist` -> Nav2 및 RL 주차 노드의 차량 제어 명령)
