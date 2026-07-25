@@ -37,11 +37,20 @@ git submodule update --init --recursive
 ---
 
 ## 4. Reference
-* **git repository:** https://github.com/linorobot/linorobot2
+* **git repository:** https://github.com/agilexrobotics/hunter_ros2.git
 ---
 
 ## 5. Pre-installation
-* -
+* $ sudo apt update && sudo apt upgrade
+* $ sudo apt install -y \
+  ros-humble-gazebo-ros-pkgs \
+  ros-humble-ros2-control \
+  ros-humble-ros2-controllers \
+  ros-humble-gazebo-ros2-control \
+  ros-humble-teleop-twist-keyboard \
+  ros-humble-joint-state-publisher \
+  ros-humble-joint-state-publisher-gui \
+  ros-humble-xacro
 ---
 
 ## 6. ROS2 노드 구성도 (아키텍처)

@@ -29,7 +29,7 @@
 터미널을 열고 Gazebo 연동 및 로봇 제어에 필요한 핵심 ROS2 패키지를 설치합니다.
 
 ```bash
-sudo apt update
+sudo apt update && sudo apt upgrade 
 sudo apt install -y \
   ros-humble-gazebo-ros-pkgs \
   ros-humble-ros2-control \
