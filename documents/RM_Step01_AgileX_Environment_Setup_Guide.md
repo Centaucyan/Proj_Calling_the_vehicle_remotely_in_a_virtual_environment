@@ -125,6 +125,20 @@ ros2 topic echo /odom
   - **원인:** Gazebo `diff_drive_controller`가 기본적으로 `/diff_drive_controller/cmd_vel_unstamped` 및 `/diff_drive_controller/odom` 경로를 사용하여, `teleop_twist_keyboard`의 기본 `/cmd_vel` 토픽과 이름 불일치 발생
   - **해결:** `ros2_control.xacro` 내 Gazebo 플러그인 항목에 `<ros><remapping>` 태그를 추가하여 `/cmd_vel` 및 `/odom` 표준 이름으로 연동
 
-* **문제 4: 주행 시 바퀴가 제자리에서 회전하지 않고 위아래로 덜컹거리며 편심 회전(캠 운동)하는 현상**
-  - **원인:** `wheel.urdf.xacro` visual 메쉬에 Z축 오프셋 `<origin xyz="0 0 -0.06" rpy="0 0 0" />`이 들어가 있어, Y축 회전 관절 대비 Z축 -6cm 유격으로 인해 최고/최저 12cm의 원 운동(Orbit) 발생
-  - **해결:** `wheel.urdf.xacro` 파일의 visual origin 오프셋을 `<origin xyz="0 0 0" rpy="0 0 0" />`으로 수정하여 회전축 수직 유격 제거
+* **문제 4: 주행 시 바퀴가 제자리에서 회전하지 않고 위아래로 덜컹거리며 편심 회전(캠 운동)하는 현상 및 스폰 시 차량 허공 부양 현상**
+  - **원인:** 
+    1) `wheel.urdf.xacro` visual 메쉬에 Z축 오프셋 `<origin xyz="0 0 -0.06" rpy="0 0 0" />`이 포함되어 Y축 회전 관절 대비 Z축 -6cm 유격으로 인해 최고/최저 12cm의 원 운동(Orbit) 발생.
+    2) `wheel.urdf.xacro` visual 메쉬의 축소 비율(`scale="0.6 0.6 0.6"`) 대비 물리 충돌 원통(`collision cylinder`)에 0.6 축소 비율이 누락되어 1.6배 거대한 투명 충돌체가 차량을 지면 위 공중에 떠받침.
+  - **해결:** 
+    1) `wheel.urdf.xacro` 23행 visual origin Z축 오프셋을 `0`으로 고정하여 회전축 유격(덜컹거림) 제거.
+      ```xml
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+      ```
+    2) `wheel.urdf.xacro` 31행 collision cylinder의 `radius` 및 `length`에 `* 0.6` 스케일을 적용하여 충돌체 크기를 시각 메쉬와 일치시킴.
+      ```xml
+      <cylinder length="${wheel_length * 0.6}" radius="${wheel_radius * 0.6}" />
+      ```
+    3) `hunter_core.urdf.xacro` 29행 차체(`chassis.dae`) 메쉬 Z축 오프셋을 `0.18`로 조율하여 바퀴 정회전과 차체 지면 안착을 완벽 정렬함.
+      ```xml
+      <origin xyz="-0.05 0 0.18" rpy="0 0 0" />
+      ```
