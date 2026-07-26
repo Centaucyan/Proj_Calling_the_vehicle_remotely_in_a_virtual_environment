@@ -2,7 +2,7 @@
 
 ## 1. Description
 * When a vehicle is summoned via remote control in a simulation environment, it will drive autonomously to the location of the remote control.
-* 이 프로젝트는 /documents/RM_Step01~02_~~.md 파일에 따라 진행되었음.
+* 이 프로젝트 과정은 '/documents/RM_Step01~10_~.md'에 정리하며 진행함.
 ---
 
 ## 2. Environment
