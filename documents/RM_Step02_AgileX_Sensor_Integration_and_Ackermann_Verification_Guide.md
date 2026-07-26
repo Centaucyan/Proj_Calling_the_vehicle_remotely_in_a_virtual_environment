@@ -41,29 +41,225 @@ sudo apt install -y \
 ---
 
 ### 3.2. [Step 2.2] Hunter URDF/Xacro 파일에 3D-LiDAR 및 카메라 센서 정의 추가
-`hunter_description/description` 폴더 내에 센서 전용 Xacro 파일(예: `sensors.xacro`)을 신규 작성하거나 기존 `hunter.urdf.xacro`에 링크 및 Gazebo ROS2 플러그인을 정의합니다.
 
-#### 1) 3D-LiDAR 센서 (Velodyne VLP-16 3D PointCloud)
-* **설치 위치:** 차체 상단 (`chassis` 링크 기준 Z: +0.3m, X: +0.1m)
-* **Gazebo 플러그인:** `libgazebo_ros_ray_sensor.so` (또는 `libgazebo_ros_velodyne_laser.so`)
+센서를 추가하는 방법은 **[방법 A: 신규 전용 파일 분리 (추천 🌟)]**와 **[방법 B: 기존 URDF 파일 직접 수정]** 중 편한 방법을 선택해 진행할 수 있습니다.
+
+---
+
+#### 📌 센서 정의 기본 소스코드 (3D-LiDAR & Camera)
+
+##### 1) 3D-LiDAR 센서 (Velodyne VLP-16 3D PointCloud)
+* **설치 위치:** 차체 상단 (`base_link` 기준 Z: +0.35m, X: +0.1m)
 * **발행 토픽:** `/points_raw` (`sensor_msgs/msg/PointCloud2`, Frame ID: `velodyne_link`)
+* **Xacro / Gazebo 플러그인 코드:**
+```xml
+<!-- 3D-LiDAR Link & Joint -->
+<link name="velodyne_link">
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <cylinder radius="0.05" length="0.07"/>
+    </geometry>
+    <material name="black">
+      <color rgba="0.1 0.1 0.1 1.0"/>
+    </material>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <cylinder radius="0.05" length="0.07"/>
+    </geometry>
+  </collision>
+  <inertial>
+    <mass value="0.8"/>
+    <origin xyz="0 0 0"/>
+    <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+  </inertial>
+</link>
 
-#### 2) Vision 카메라 센서 (RGB Camera)
-* **설치 위치:** 차체 전방 (`chassis` 링크 기준 Z: +0.2m, X: +0.45m)
-* **Gazebo 플러그인:** `libgazebo_ros_camera.so`
-* **발행 토픽:** `/camera/image_raw` (`sensor_msgs/msg/Image`, Frame ID: `camera_link`)
+<joint name="velodyne_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="velodyne_link"/>
+  <origin xyz="0.1 0 0.35" rpy="0 0 0"/>
+</joint>
+
+<!-- Gazebo 3D LiDAR Plugin -->
+<gazebo reference="velodyne_link">
+  <sensor type="ray" name="velodyne_sensor">
+    <pose>0 0 0 0 0 0</pose>
+    <visualize>false</visualize>
+    <update_rate>10</update_rate>
+    <ray>
+      <scan>
+        <horizontal>
+          <samples>360</samples>
+          <resolution>1</resolution>
+          <min_angle>-3.14159265</min_angle>
+          <max_angle>3.14159265</max_angle>
+        </horizontal>
+        <vertical>
+          <samples>16</samples>
+          <resolution>1</resolution>
+          <min_angle>-0.261799</min_angle> <!-- -15 deg -->
+          <max_angle>0.261799</max_angle>  <!-- +15 deg -->
+        </vertical>
+      </scan>
+      <range>
+        <min>0.3</min>
+        <max>100.0</max>
+        <resolution>0.001</resolution>
+      </range>
+    </ray>
+    <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_ray_sensor.so">
+      <ros>
+        <remapping>~/out:=/points_raw</remapping>
+      </ros>
+      <output_type>sensor_msgs/PointCloud2</output_type>
+      <frame_name>velodyne_link</frame_name>
+    </plugin>
+  </sensor>
+</gazebo>
+```
+
+---
+
+##### 2) Vision 카메라 센서 (RGB Camera)
+* **설치 위치:** 차체 전방 (`base_link` 기준 Z: +0.25m, X: +0.45m)
+* **발행 토픽:** `/camera/image_raw` (`sensor_msgs/msg/Image`, Frame ID: `camera_link`) 및 `/camera/camera_info`
+* **Xacro / Gazebo 플러그인 코드:**
+```xml
+<!-- Camera Link & Joint -->
+<link name="camera_link">
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <box size="0.03 0.08 0.03"/>
+    </geometry>
+    <material name="red">
+      <color rgba="0.8 0.1 0.1 1.0"/>
+    </material>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <box size="0.03 0.08 0.03"/>
+    </geometry>
+  </collision>
+  <inertial>
+    <mass value="0.1"/>
+    <origin xyz="0 0 0"/>
+    <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+  </inertial>
+</link>
+
+<joint name="camera_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="camera_link"/>
+  <origin xyz="0.45 0 0.25" rpy="0 0 0"/>
+</joint>
+
+<!-- Gazebo Camera Plugin -->
+<gazebo reference="camera_link">
+  <sensor type="camera" name="camera_sensor">
+    <update_rate>30.0</update_rate>
+    <camera name="front_camera">
+      <horizontal_fov>1.3962634</horizontal_fov> <!-- 약 80도 -->
+      <image>
+        <width>640</width>
+        <height>480</height>
+        <format>R8G8B8</format>
+      </image>
+      <clip>
+        <near>0.02</near>
+        <far>300</far>
+      </clip>
+    </camera>
+    <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+      <ros>
+        <remapping>~/image_raw:=/camera/image_raw</remapping>
+        <remapping>~/camera_info:=/camera/camera_info</remapping>
+      </ros>
+      <camera_name>camera</camera_name>
+      <frame_name>camera_link</frame_name>
+    </plugin>
+  </sensor>
+</gazebo>
+```
+
+---
+
+#### 🛠️ 적용 방법 두 가지 설명
+
+##### [방법 A] 신규 전용 파일 분리 (`sensors.xacro` 생성 - 추천 🌟)
+1. `ros2_ws/src/hunter_robot/hunter_description/description/sensors.xacro` 파일 생성
+2. 아래 내용 전체 저장:
+```xml
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- 위에서 정의한 3D-LiDAR 코드 및 Camera 코드 전체를 여기에 넣습니다 -->
+</robot>
+```
+3. `hunter_description/description/hunter.urdf.xacro`의 `<robot>` 태그 안쪽에 다음 include 구문 1줄 추가:
+```xml
+<xacro:include filename="$(find hunter_description)/description/sensors.xacro" />
+```
+
+##### [방법 B] 기존 파일 직접 수정 (`hunter_core.urdf.xacro` 수정)
+1. `ros2_ws/src/hunter_robot/hunter_description/description/hunter_core.urdf.xacro` 파일 열기
+2. `<xacro:macro name="dogbot" ...>` 태그 안쪽 맨 아래(휠 정의 바로 위) 또는 맨 끝에 위 **3D-LiDAR 코드 및 Camera 코드**를 직접 붙여넣기 후 저장.
 
 ---
 
 ### 3.3. [Step 2.3] RViz2 시각화 설정 프로파일 구축 (`view_hunter.rviz`)
-센서 데이터를 실시간 한눈에 모니터링할 수 있도록 RViz2 설정 파일(`hunter_gazebo/config/view_hunter.rviz`)을 작성/업데이트합니다.
 
-* **Fixed Frame:** `odom` (또는 `base_link`)
-* **Display 항목 추가:**
-  - `RobotModel`: 로봇 외관 3D 렌더링
-  - `TF`: `odom` -> `base_link` -> `velodyne_link` / `camera_link` 프레임 트리 확인
-  - `PointCloud2`: Topic = `/points_raw`, Size = 0.03m, Color Transformer = Intensity / AxisColor
-  - `Image`: Topic = `/camera/image_raw`
+3D-LiDAR(`PointCloud2`)와 카메라(`Image`) 데이터를 RViz2 화면에서 한눈에 모니터링할 수 있도록 시각화 항목을 추가하고 설정 프로파일(`view_hunter.rviz`)을 업데이트합니다.
+
+#### 💡 적용 방법 2가지
+
+##### [방법 1] RViz2 GUI 화면에서 버튼 클릭으로 추가 및 저장 (추천 🌟)
+1. Gazebo 시뮬레이션 및 RViz2 구동:
+   ```bash
+   # ('ros2_ws/' 경로에서 실행)
+   ros2 launch hunter_gazebo launch_sim.launch.py
+   # (별도 터미널) 
+   rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
+   ```
+2. RViz2 프로그램 좌측 **Displays** 패널 하단의 **[Add]** 버튼 클릭
+3. **[By topic]** 탭 선택 후 2개 항목 추가:
+   * `/points_raw` 아래 **`PointCloud2`** 선택 → [OK]
+   * `/camera/image_raw` 아래 **`Image`** 선택 → [OK]
+4. **PointCloud2 옵션 조절**:
+   * `Size (m)`: `0.03` (포인트 점 크기 조절)
+   * `Color Transformer`: `Intensity` 또는 `AxisColor` (거리/강도별 무지개 색상 부여)
+5. 설정 저장: 상단 메뉴 **File > Save Config** (단축키 `Ctrl + S`)를 눌러 `view_hunter.rviz` 파일에 반영
+
+##### [방법 2] `view_hunter.rviz` 파일 직접 수정 (설정 코드 추가)
+`ros2_ws/src/hunter_robot/hunter_gazebo/config/view_hunter.rviz` 파일의 `Displays:` 항목 아래에 아래 YAML 코드를 추가하고 저장합니다:
+
+```yaml
+    - Class: rviz_default_plugins/PointCloud2
+      Enabled: true
+      Name: PointCloud2
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /points_raw
+      Size (m): 0.03
+      Style: Points
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Name: CameraImage
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /camera/image_raw
+      Value: true
+```
 
 ---
 

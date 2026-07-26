@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"  name="robot">
+    <xacro:include filename="$(find hunter_description)/description/sensors.xacro" />  <!--RM_Step02 과정에서 추가 -->
     <xacro:arg name="prefix" default="" />
     <xacro:arg name="use_ros2_control" default="true"/>
     <xacro:arg name="is_sim" default="true"/>
@@ -12,5 +13,4 @@
     <xacro:unless value="$(arg use_ros2_control)">
         <xacro:include filename="$(find hunter_description)/description/gazebo_control.xacro" />
     </xacro:unless>
-
 </robot>
