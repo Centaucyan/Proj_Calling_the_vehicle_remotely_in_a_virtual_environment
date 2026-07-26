@@ -2,6 +2,7 @@
 
 ## 1. Description
 * When a vehicle is summoned via remote control in a simulation environment, it will drive autonomously to the location of the remote control.
+* 이 프로젝트는 /documents/RM_Step01~02_~~.md 파일에 따라 진행되었음.
 ---
 
 ## 2. Environment
@@ -13,10 +14,10 @@
 
 ## 3. 저장소 클론 및 서브모듈(Submodule) 다운로드 가이드
 
-다른 PC나 새로운 개발 환경에서 이 저장소를 클론할 때 외부 의존성 서브모듈(`ros2_ws/src/hunter_ros2` 등)을 함께 내려받는 2가지 방법입니다.
+다른 PC나 새로운 개발 환경에서 이 저장소를 클론할 때 외부 의존성 서브모듈(`ros2_ws/src/hunter_ros2` 등)을 함께 내려받는 2가지 방법.
 
 ### 3.1. [방법 1] 저장소 클론 시 서브모듈 한 번에 내려받기 (추천 🌟)
-`--recurse-submodules` 옵션을 사용하면 메인 저장소와 연결된 모든 서브모듈을 한 번에 자동으로 클론합니다.
+`--recurse-submodules` 옵션을 사용하면 메인 저장소와 연결된 모든 서브모듈을 한 번에 자동으로 클론함.
 
 ```bash
 git clone --recurse-submodules https://github.com/Centaucyan/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment.git
@@ -24,7 +25,7 @@ cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment
 ```
 
 ### 3.2. [방법 2] 일반 `git clone` 후 서브모듈 별도 동기화하기
-이미 `git clone`을 실행했거나 서브모듈이 다운로드되지 않아 폴더가 비어있는 경우 서브모듈을 초기화하고 수동으로 내려받습니다.
+이미 `git clone`을 실행했거나 서브모듈이 다운로드되지 않아 폴더가 비어있는 경우 서브모듈을 초기화하고 수동으로 내려받음.
 
 ```bash
 # 1. 메인 저장소 클론 및 이동
@@ -52,7 +53,11 @@ git submodule update --init --recursive
   ros-humble-teleop-twist-keyboard \
   ros-humble-joint-state-publisher \
   ros-humble-joint-state-publisher-gui \
-  ros-humble-xacro
+  ros-humble-xacro \
+  ros-humble-gazebo-plugins \
+  ros-humble-velodyne-description \
+  ros-humble-image-transport-plugins \
+  ros-humble-rviz2
 ---
 
 ## 6. ROS2 노드 구성도 (아키텍처)
