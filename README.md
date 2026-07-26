@@ -8,7 +8,7 @@
 
 ## 2. Environment
 * **OS:** Ubuntu 22.04 LTS(Jammy Jellyfish)
-* **Language:** C++, Python(ver: 3.12.13)
+* **Language:** C++, Python(ver: 3.10.12)
 * **Middle ware:** ROS2 Humble
 * **Visualization Tool:** RViz2
 ---
