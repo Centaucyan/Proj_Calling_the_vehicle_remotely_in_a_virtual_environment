@@ -39,13 +39,7 @@ git submodule update --init --recursive
 ```
 ---
 
-## 4. Reference
-* **git repository:** 
-  * https://github.com/LCAS/hunter_robot.git
-  * https://github.com/agilexrobotics/ugv_sdk.git
----
-
-## 5. Pre-installation
+## 4. Pre-installation
 * $ sudo apt update && sudo apt upgrade
 * $ sudo apt install -y \
   ros-humble-gazebo-ros-pkgs \
@@ -62,6 +56,38 @@ git submodule update --init --recursive
   ros-humble-rviz2
 ---
 
-## 6. ROS2 노드 구성도 (아키텍처)
+## 5. Execute Commands
+```bash
+# 1. ros2_ws 이동
+cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
+
+# 2. 의존성 패키지 설치(git clone 후 처음에만 실행)
+sudo rosdep init
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+
+# 3. ros packages build(git clone 후 처음에만 실행)
+colcon build
+
+# 4. Gazebo 시뮬레이션 스폰 (3D-LiDAR & 카메라 통합 로봇)
+source install/setup.bash
+ros2 launch hunter_gazebo launch_sim.launch.py
+
+# 5. 새 터미널에서 RViz2 구동 및 센서 시각화 확인
+source install/setup.bash
+rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
+
+# 6. 새 터미널에서 키보드 노드 실행 및 차량 조작
+source install/setup.bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+## 6. Reference
+* **git repository:** 
+  * https://github.com/LCAS/hunter_robot.git
+  * https://github.com/agilexrobotics/ugv_sdk.git
+---
+
+## 7. ROS2 노드 구성도 (아키텍처)
 ![Node Architecture](./documents/images/ROS2_node_structure.png)
 ---
