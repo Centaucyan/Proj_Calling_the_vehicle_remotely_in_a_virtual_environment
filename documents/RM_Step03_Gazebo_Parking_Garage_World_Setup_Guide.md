@@ -9,7 +9,7 @@
 * **목표:** AgileX Hunter 2.0 차체 규격(약 1.0m × 0.75m)에 맞춘 흰색 주차 구획선(1.5m × 2.2m), 외벽 및 진입로, 선행 주차 차량/라바콘 장애물, 그리고 PRD 요구사항(Vision AI 및 RL 정밀 밀착 주차)을 충족하는 콘크리트 기둥 타겟이 포함된 전용 가상 주차장 월드(`parking_garage.world`)를 구축하고 검증합니다.
 * **주요 검증 요소:**
   - Gazebo 시뮬레이터 상에 외벽(입구 갭 포함), 흰색 주차 구획선, 주차 기둥, 장애물 요소가 배치된 `parking_garage.world` 정상 로딩 여부
-  - 주차장 월드 중앙`(0, 0, 0.25)`에 AgileX Hunter (3D-LiDAR 및 카메라 통합 로봇) 스폰 정상 구동 여부
+  - 주차장 월드 입구`(0, -8, 0.25)`에 AgileX Hunter (3D-LiDAR 및 카메라 통합 로봇) 스폰 정상 구동 여부
   - RViz2 상에서 주차 구획선 및 벽/기둥 형태가 3D-LiDAR 포인트 클라우드(`/points_raw`)와 카메라 이미지(`/camera/image_raw`)로 선명하게 렌더링되는지 모니터링
   - `teleop_twist_keyboard` 주행을 통한 주차선 내 차량 주차 및 벽/기둥 장애물 물리 충돌 및 오도메트리 반영 검증
 
@@ -22,12 +22,13 @@
 - **시뮬레이터:** Gazebo Classic (v11) & RViz2
 - **신규 월드 파일 생성 경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/worlds/parking_garage.world`
 - **런치 스크립트 수정 경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/launch_sim.launch.py`
+- **CMake 빌드 설정 수정 경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/CMakeLists.txt`
 
 ---
 
 ## 3. 단계별 상세 실행 절차
 
-### 3.1. [Step 3.1] AgileX 맞춤형 가상 주차장 World SDF 파일 작성 (`parking_garage.world`)
+### 3.1. [Step 3.1] AgileX 맞춤형 가상 주차장 World SDF 파일 신규 작성 (`parking_garage.world`)
 
 AgileX Hunter 규격 맞춤 주차 구획선(가로 1.5m × 세로 2.2m), 외벽, 입구, 기둥 및 장애물이 수록된 Gazebo World SDF 정의 파일을 생성합니다.
 
@@ -273,9 +274,45 @@ AgileX Hunter 규격 맞춤 주차 구획선(가로 1.5m × 세로 2.2m), 외벽
 
 ### 3.2. [Step 3.2] Hunter Gazebo Launch 파일에 `parking_garage.world` 연동
 
-`launch_sim.launch.py` 런치 파일이 기본적으로 신규 `parking_garage.world`를 로드하도록 파라미터 기본값을 업데이트합니다.
+`launch_sim.launch.py` 런치 파일이 기본적으로 신규 `parking_garage.world`를 로드하도록 파라미터 기본값을 업데이트합니다. (기존 파일 수정)
 
 * **파일 위치:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/launch_sim.launch.py`
+
+#### 📌 변경 사항 요약 (삭제 `-` 및 추가 `+` 구분)
+
+```diff
+  # 2. parking_garage.world 파일 경로 지정
++ world_file_path = os.path.join(
++     get_package_share_directory('hunter_gazebo'), 'worlds', 'parking_garage.world'
++ )
+  gazebo_params_file = os.path.join(
+      get_package_share_directory('hunter_gazebo'), 'config', 'gazebo_params.yaml'
+  )
+
+  # 3. Gazebo Launch (world 파라미터 전달)
+  gazebo = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+          get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py'
+      )]),
+-     launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file}.items()
++     launch_arguments={
++         'world': world_file_path,
++         'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file
++     }.items()
+  )
+
+  # 4. AgileX Hunter 로봇 스폰 (주차장 입구 스폰)
+  spawn_entity = Node(
+      package='gazebo_ros', executable='spawn_entity.py',
+      arguments=['-topic', 'robot_description',
+                 '-entity', 'hunter_gazebo',
+-                '-z', '0.25'],
++                '-x', '0.0', '-y', '-8.0', '-z', '0.25'],
+      output='screen'
+  )
+```
+
+#### 📄 수정 완료된 전체 `launch_sim.launch.py` 코드
 
 ```python
 import os
@@ -312,7 +349,7 @@ def generate_launch_description():
         }.items()
     )
 
-    # 4. AgileX Hunter 로봇 스폰 (주차장 중앙 스폰)
+    # 4. AgileX Hunter 로봇 스폰 (주차장 입구 스폰)
     spawn_entity = Node(
         package='gazebo_ros', executable='spawn_entity.py',
         arguments=['-topic', 'robot_description',
@@ -341,7 +378,50 @@ def generate_launch_description():
 
 ---
 
-### 3.3. [Step 3.3] 주차장 월드 스폰 및 센서 토픽/시각화 모니터링
+### 3.3. [Step 3.3] `hunter_gazebo/CMakeLists.txt`에 `worlds` 디렉터리 Install 규칙 추가
+
+`colcon build` 실행 시 신규 생성한 `parking_garage.world` 파일이 패키지 설치 경로(`install/`)로 정상 복사되도록 `CMakeLists.txt` 파일의 install 디렉터리 목록에 `worlds`를 추가합니다.
+
+* **파일 위치:** `ros2_ws/src/hunter_robot/hunter_gazebo/CMakeLists.txt`
+
+#### 📌 변경 사항 요약 (삭제 `-` 및 추가 `+` 구분)
+
+```diff
+  install(
+-   DIRECTORY config launch
++   DIRECTORY config launch worlds
+    DESTINATION share/${PROJECT_NAME}
+  )
+```
+
+#### 📄 수정 완료된 전체 `CMakeLists.txt` 코드
+
+```cmake
+cmake_minimum_required(VERSION 3.8)
+project(hunter_gazebo)
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# find dependencies
+find_package(ament_cmake REQUIRED)
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+endif()
+
+install(
+  DIRECTORY config launch worlds
+  DESTINATION share/${PROJECT_NAME}
+)
+
+ament_package()
+```
+
+---
+
+### 3.4. [Step 3.4] 주차장 월드 스폰 및 센서 토픽/시각화 모니터링
 
 ```bash
 cd ~/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
@@ -357,7 +437,7 @@ rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
 
 ---
 
-### 3.4. [Step 3.4] teleop 키보드 수동 주행 및 주차선/장애물 반응 테스트
+### 3.5. [Step 3.5] teleop 키보드 수동 주행 및 주차선/장애물 반응 테스트
 
 ```bash
 # 별도 터미널에서 키보드 수동 조종 노드 실행
@@ -383,7 +463,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 
 * **문제 1: `colcon build` 후 `parking_garage.world` 파일을 찾을 수 없는 오류**
   - **원인:** `hunter_gazebo/CMakeLists.txt` 파일에 `worlds` 디렉터리 install 규칙이 누락됨
-  - **해결:** `hunter_gazebo/CMakeLists.txt` 파일 내 `install(DIRECTORY launch config description worlds DESTINATION share/${PROJECT_NAME})` 구문 수정 및 추가
+  - **해결:** `hunter_gazebo/CMakeLists.txt` 파일 내 `install(DIRECTORY config launch worlds DESTINATION share/${PROJECT_NAME})` 구문 수정 및 추가
 
 * **문제 2: 주차선(White Lines)이 지면 메쉬 아래로 사라지거나 깜빡거리는 현상 (Z-fighting)**
   - **원인:** 지면 plane`(Z=0)`과 주차선 visual의 높이 차이가 없거나 너무 미세함

@@ -14,6 +14,7 @@ def generate_launch_description():
     # Include the robot_state_publisher launch file, provided by our own package. Force sim time to be enabled
     # !!! MAKE SURE YOU SET THE PACKAGE NAME CORRECTLY !!!
 
+    # 1. Robot State Publisher 런치
     rsp = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory('hunter_description'),'launch','rsp.launch.py'
@@ -21,23 +22,35 @@ def generate_launch_description():
     )
 
 
-    gazebo_params_file = os.path.join(get_package_share_directory('hunter_gazebo'),'config','gazebo_params.yaml')
+    # 2. parking_garage.world 파일 경로 지정(By Tae)
+    world_file_path = os.path.join(
+        get_package_share_directory('hunter_gazebo'), 'worlds', 'parking_garage.world'
+    )
 
+    gazebo_params_file = os.path.join(
+        get_package_share_directory('hunter_gazebo'),'config','gazebo_params.yaml'
+    )
+
+    # 3. Gazebo Launch (world 파라미터 전달)
     # Include the Gazebo launch file, provided by the gazebo_ros package
     gazebo = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
-                    launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file}.items()
+                    #.(주차장 World 파일 적용으로 주석 처리) launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file}.items()
+                    launch_arguments={
+                        'world': world_file_path,
+                        'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file
+                    }.items()
              )
 
+    # 4. AgileX Hunter 로봇 스폰 (주차장 입구 스폰)
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-topic', 'robot_description',
                                    '-entity', 'hunter_gazebo',
-                                   '-z', '0.25'],
+                                #. (주차장 World 파일 적용으로 추석 처리)    '-z', '0.25'],
+                                   '-x', '0.0', '-y', '-8.0', '-z', '0.25'],
                         output='screen')
-
-
 
 
     diff_drive_spawner = Node(

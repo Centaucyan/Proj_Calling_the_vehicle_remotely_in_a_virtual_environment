@@ -1,0 +1,296 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="parking_garage">
+    
+    <!-- 태양광 조명 설정 -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- 아스팔트 지면 평면 -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- 물리 엔진 파라미터 (ODE) -->
+    <physics type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <!-- ==================== 1. 외벽 및 입구 (Outer Walls & Entrance) ==================== -->
+    <!-- North Wall -->
+    <model name="wall_north">
+      <pose>0 12.0 1.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>24.0 0.3 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>24.0 0.3 2.5</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- East Wall -->
+    <model name="wall_east">
+      <pose>12.0 0 1.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.3 24.0 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.3 24.0 2.5</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- West Wall -->
+    <model name="wall_west">
+      <pose>-12.0 0 1.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.3 24.0 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.3 24.0 2.5</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- South Wall Left (입구 좌측 벽) -->
+    <model name="wall_south_left">
+      <pose>-7.5 -12.0 1.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>9.0 0.3 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>9.0 0.3 2.5</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- South Wall Right (입구 우측 벽) -->
+    <model name="wall_south_right">
+      <pose>7.5 -12.0 1.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>9.0 0.3 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>9.0 0.3 2.5</size></box></geometry>
+          <material>
+            <ambient>0.85 0.85 0.85 1</ambient>
+            <diffuse>0.85 0.85 0.85 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ==================== 2. PRD 정밀 주차용 콘크리트 기둥 (Pillars) ==================== -->
+    <!-- 주차 타겟 기둥 1 (Target Pillar 1) -->
+    <model name="target_pillar_1">
+      <pose>4.0 3.0 1.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.8 0.8 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.8 0.8 2.5</size></box></geometry>
+          <material>
+            <ambient>0.2 0.4 0.8 1</ambient>
+            <diffuse>0.2 0.4 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 주차 타겟 기둥 2 (Target Pillar 2) -->
+    <model name="target_pillar_2">
+      <pose>-4.0 3.0 1.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>0.8 0.8 2.5</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.8 0.8 2.5</size></box></geometry>
+          <material>
+            <ambient>0.2 0.4 0.8 1</ambient>
+            <diffuse>0.2 0.4 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ==================== 3. AgileX 맞춤형 흰색 주차 구획선 (Parking Bay Lines) ==================== -->
+    <!-- Central Parking Bays (Center Left Row) -->
+    <model name="parking_lines_center">
+      <pose>0 0 0.002 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <!-- Center Backbone Line -->
+        <visual name="line_center_back">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry><box><size>0.08 10.0 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+        <!-- Horizontal Bay Divider Lines (1.5m x 2.2m bays) -->
+        <visual name="line_div_1">
+          <pose>0 5.0 0 0 0 0</pose>
+          <geometry><box><size>4.4 0.08 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+          </material>
+        </visual>
+        <visual name="line_div_2">
+          <pose>0 3.5 0 0 0 0</pose>
+          <geometry><box><size>4.4 0.08 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+          </material>
+        </visual>
+        <visual name="line_div_3">
+          <pose>0 2.0 0 0 0 0</pose>
+          <geometry><box><size>4.4 0.08 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+          </material>
+        </visual>
+        <visual name="line_div_4">
+          <pose>0 0.5 0 0 0 0</pose>
+          <geometry><box><size>4.4 0.08 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+          </material>
+        </visual>
+        <visual name="line_div_5">
+          <pose>0 -1.0 0 0 0 0</pose>
+          <geometry><box><size>4.4 0.08 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            </material></visual>
+        <visual name="line_div_6">
+          <pose>0 -2.5 0 0 0 0</pose>
+          <geometry><box><size>4.4 0.08 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+          </material>
+        </visual>
+        <visual name="line_div_7">
+          <pose>0 -4.0 0 0 0 0</pose>
+          <geometry><box><size>4.4 0.08 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+          </material>
+        </visual>
+        <visual name="line_div_8">
+          <pose>0 -5.5 0 0 0 0</pose>
+          <geometry><box><size>4.4 0.08 0.001</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+          </material>
+        </visual>
+        
+        <!-- Outer Boundary Lines -->
+        <visual name="line_outer_left">
+            <pose>-2.2 -0.25 0 0 0 0</pose>
+            <geometry><box><size>0.08 10.5 0.001</size></box></geometry>
+            <material>
+                <ambient>1 1 1 1</ambient>
+            </material>
+        </visual>
+        <visual name="line_outer_right">
+            <pose>2.2 -0.25 0 0 0 0</pose>
+            <geometry><box><size>0.08 10.5 0.001</size></box></geometry>
+            <material>
+                <ambient>1 1 1 1</ambient>
+            </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ==================== 4. 주차 장애물 (Parked Vehicles & Cones) ==================== -->
+    <!-- 주차 구획 내 선행 주차 차량 1 (Parked Car 1) -->
+    <model name="parked_car_1">
+      <pose>-1.1 2.75 0.4 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.6 1.0 0.8</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.6 1.0 0.8</size></box></geometry>
+          <material>
+            <ambient>0.1 0.3 0.7 1</ambient> <!-- 파란색 세단 장애물 -->
+            <diffuse>0.1 0.3 0.7 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 주차 구획 내 선행 주차 차량 2 (Parked Car 2) -->
+    <model name="parked_car_2">
+      <pose>1.1 -1.75 0.4 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><box><size>1.6 1.0 0.8</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>1.6 1.0 0.8</size></box></geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient> <!-- 은색 SUV 장애물 -->
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 라바콘 장애물 (Traffic Cone) -->
+    <model name="traffic_cone_1">
+      <pose>-1.1 -0.25 0.25 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><cylinder radius="0.15" length="0.5"/></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><cylinder radius="0.15" length="0.5"/></geometry>
+          <material>
+            <ambient>1.0 0.3 0.0 1</ambient> <!-- 주황색 안전 콘 -->
+            <diffuse>1.0 0.3 0.0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

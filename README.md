@@ -1,9 +1,10 @@
 # Proj_Calling_the_vehicle_remotely_in_a_simulation_env
 
-* Update: 2026.07.26. (프로젝트 3/10 단계 진행 중)
+* Update: 2026.07.27. (프로젝트 3/10 단계 진행 중)
 ## 1. Description
 * When a vehicle is summoned via remote control in a simulation environment, it will drive autonomously to the location of the remote control.
 * 프로젝트 과정은 '/documents/RM_Step01-10_~.md'에 정리하며 진행함.
+* Vehicle model: AgileX Hunter
 ---
 
 ## 2. Environment
