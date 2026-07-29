@@ -57,7 +57,9 @@ git submodule update --init --recursive
   ros-humble-gazebo-plugins \
   ros-humble-velodyne-description \
   ros-humble-image-transport-plugins \
-  ros-humble-rviz2
+  ros-humble-rviz2 \
+  ros-humble-slam-toolbox \
+  ros-humble-nav2-map-server
 ---
 
 ## 5. Execute Commands
