@@ -3,10 +3,7 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /Global Options1
-        - /Status1
-        - /Axes1
+      Expanded: ~
       Splitter Ratio: 0.5
     Tree Height: 355
   - Class: rviz_common/Selection
@@ -132,12 +129,12 @@ Visualization Manager:
       Update Interval: 0
       Value: false
     - Class: rviz_default_plugins/Axes
-      Enabled: true
+      Enabled: false
       Length: 1
       Name: Axes
       Radius: 0.019999999552965164
       Reference Frame: <Fixed Frame>
-      Value: true
+      Value: false
     - Class: rviz_default_plugins/Camera
       Enabled: true
       Far Plane Distance: 100
@@ -162,8 +159,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 2.4336459636688232
+        Min Value: -0.06624510884284973
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -180,9 +177,9 @@ Visualization Manager:
       Name: PointCloud2
       Position Transformer: XYZ
       Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.009999999776482582
-      Style: Flat Squares
+      Size (Pixels): 2
+      Size (m): 0.019999999552965164
+      Style: Points
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -239,25 +236,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.641228675842285
+      Distance: 28.535438537597656
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.5142588019371033
-        Y: -0.14778445661067963
-        Z: 0.15979790687561035
+        X: 5.325308799743652
+        Y: 5.279142379760742
+        Z: 0.05656599625945091
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5352025032043457
+      Pitch: 0.550202488899231
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.2022199630737305
+      Yaw: 2.302216053009033
     Saved: ~
 Window Geometry:
   Camera:
@@ -277,5 +274,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1462
-  X: 1506
-  Y: 230
+  X: 2183
+  Y: 161
