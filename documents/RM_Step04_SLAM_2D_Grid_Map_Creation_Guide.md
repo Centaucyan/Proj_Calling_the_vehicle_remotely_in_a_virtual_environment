@@ -39,7 +39,7 @@ sudo apt install -y ros-humble-slam-toolbox ros-humble-nav2-map-server
 
 ---
 
-### 3.2. [Step 4.2] `slam_toolbox` 파라미터 파일 작성 (`mapper_params_online_async.yaml`)
+### 3.2. [Step 4.2] `slam_toolbox` 파라미터 파일 신규 작성 (`mapper_params_online_async.yaml`)
 
 AgileX Hunter의 센서 프레임(`base_link`, `odom`, `/scan`)에 맞춰 `slam_toolbox` 파라미터 설정을 구성합니다.
 
@@ -89,7 +89,7 @@ slam_toolbox:
 
 ---
 
-### 3.3. [Step 4.3] SLAM 및 Gazebo 통합 런치 파일 작성 (`slam_mapping.launch.py`)
+### 3.3. [Step 4.3] SLAM 및 Gazebo 통합 런치 파일 신규 작성 (`slam_mapping.launch.py`)
 
 주차장 월드 Gazebo 구동과 `slam_toolbox` 노드를 동시에 실행할 수 있는 통합 런치 스크립트를 생성합니다.
 
