@@ -2,10 +2,12 @@
 
 * Update: 2026.07.29.(프로젝트 4/10 단계 진행 중)
 ## 1. Description
+* 시뮬레이션 환경에서 리모컨(Qt Dashborad)으로 차량을 호출하면, 차량은 리모컨의 위치로 자율 주행 이동.(프로젝트 과정은 '/documents/RM_Step01-10_*.md'에 정리하며 진행)
 * **Github Repository:** https://github.com/Centaucyan/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment.git
-* When a vehicle is summoned via remote control in a simulation environment, it will drive autonomously to the location of the remote control.
-* 프로젝트 과정은 '/documents/RM_Step01-10_~.md'에 정리하며 진행함.
-* Vehicle model: AgileX Hunter
+* **Vehicle model:** AgileX Hunter
+* **Tool:**
+  * slam-toolbox
+  * nav2-map-server
 ![Gazebo](./documents/images/hunter_in_gazebo.png)
 ![Rviz2](./documents/images/hunter_in_rviz2.png)
 ---
