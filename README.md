@@ -1,17 +1,20 @@
 # Proj_Calling_the_vehicle_remotely_in_a_simulation_env
 
-* Update: 2026.07.28. (프로젝트 3/10 단계 완료)
+* Update: 2026.07.29.(프로젝트 3/10 단계 완료)
 ## 1. Description
+* **Github Repository:** https://github.com/Centaucyan/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment.git
 * When a vehicle is summoned via remote control in a simulation environment, it will drive autonomously to the location of the remote control.
 * 프로젝트 과정은 '/documents/RM_Step01-10_~.md'에 정리하며 진행함.
 * Vehicle model: AgileX Hunter
+![Gazebo](./documents/images/hunter_in_gazebo.png)
+![Rviz2](./documents/images/hunter_in_rviz2.png)
 ---
 
 ## 2. Environment
 * **OS:** Ubuntu 22.04 LTS(Jammy Jellyfish)
-* **Language:** C++, Python(ver: 3.10.12)
+* **Language:** C++, Python(Ver: 3.10)
 * **Middle ware:** ROS 2 Humble Hawksbill
-* **Simulator:** Gazebo(ver: 11.10.2)
+* **Simulator:** Gazebo
 * **Visualization Tool:** RViz2
 ---
 
@@ -67,7 +70,7 @@ sudo rosdep init
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 
-# 3. ros packages build(git clone 후 처음에만 실행)
+# 3. ros packages build
 colcon build
 
 # 4. Gazebo 시뮬레이션 스폰 (3D-LiDAR & 카메라 통합 로봇)
