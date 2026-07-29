@@ -87,7 +87,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
 ## 6. Reference
-* **git repository:** 
+* **Github Repository:** 
   * https://github.com/LCAS/hunter_robot.git
   * https://github.com/agilexrobotics/ugv_sdk.git
 ---
