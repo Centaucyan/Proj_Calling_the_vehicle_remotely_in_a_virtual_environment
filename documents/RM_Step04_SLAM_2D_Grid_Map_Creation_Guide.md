@@ -151,22 +151,36 @@ install(
 
 ### 3.5. [Step 4.5] 주차장 월드 매핑 주행 및 맵 저장
 
-#### 1) SLAM 통합 런치 실행
+> [!NOTE]
+> 아래의 각 단계(1~4번)는 동시 구동을 위해 반드시 **서로 다른 개별 터미널**을 열어 각각 실행해야 합니다.
+
+#### 1) [터미널 1] SLAM 통합 런치 실행
 ```bash
 cd ros2_ws
 colcon build --symlink-install
 source install/setup.bash
 ros2 launch hunter_gazebo slam_mapping.launch.py
 ```
+* Gazebo 주차장 월드가 열리고 `slam_toolbox` 노드가 실행됩니다.
 
-#### 2) 키보드 제어로 주차장 전체 구역 조종 주행
+#### 2) [터미널 2] RViz2 구동 및 실시간 2D 지도 시각화 (선택 및 권장 🌟)
+```bash
+source install/setup.bash
+rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
+```
+* **RViz2 디스플레이 설정 방법:**
+  - RViz2 좌측 Displays 패널 하단 `Add` 버튼 클릭
+  - `By topic` 탭에서 `/map` 토픽 하위의 `Map` 선택 후 `OK` 클릭
+  - Fixed Frame이 `map` (또는 `odom`)으로 설정되어 있는지 확인하고, 차량 이동에 따라 실시간 2D 격자 지도가 확장되는지 모니터링합니다.
+
+#### 3) [터미널 3] 키보드 제어로 주차장 전체 구역 조종 주행
 ```bash
 source install/setup.bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
-* 로봇을 천천히 주차장 내부 통로, 기둥 둘레, 구획선 근처로 이동시켜 2D 격자 지도를 완성합니다.
+* 로봇을 천천히 주차장 내부 통로, 4개 기둥 둘레, 구획선 근처로 이동시켜 2D 격자 지도를 완성합니다.
 
-#### 3) 완성된 2D 지도 저장
+#### 4) [터미널 4] 완성된 2D 지도 저장 (주행 완료 후)
 ```bash
 source install/setup.bash
 mkdir -p src/hunter_robot/hunter_gazebo/maps
