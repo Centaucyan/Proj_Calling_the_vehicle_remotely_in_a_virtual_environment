@@ -30,11 +30,11 @@
 
 ### 3.1. [Step 4.1] SLAM 의존성 패키지 설치 확인
 
-SLAM 및 맵 저장 도구가 설치되어 있지 않은 경우 설치합니다.
+SLAM, 맵 저장 도구 및 3D PointCloud -> 2D LaserScan 변환 패키지가 설치되어 있지 않은 경우 설치합니다.
 
 ```bash
 sudo apt update
-sudo apt install -y ros-humble-slam-toolbox ros-humble-nav2-map-server
+sudo apt install -y ros-humble-slam-toolbox ros-humble-nav2-map-server ros-humble-pointcloud-to-laserscan
 ```
 
 ---
@@ -91,7 +91,7 @@ slam_toolbox:
 
 ### 3.3. [Step 4.3] SLAM 및 Gazebo 통합 런치 파일 신규 작성 (`slam_mapping.launch.py`)
 
-주차장 월드 Gazebo 구동과 `slam_toolbox` 노드를 동시에 실행할 수 있는 통합 런치 스크립트를 생성합니다.
+주차장 월드 Gazebo 구동, 3D PointCloud -> 2D LaserScan 변환 노드, 그리고 `slam_toolbox` 노드를 동시에 실행할 수 있는 통합 런치 스크립트를 작성합니다.
 
 * **파일 위치:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/slam_mapping.launch.py`
 
@@ -113,10 +113,35 @@ def generate_launch_description():
         )
     )
 
-    # 2. SLAM Toolbox 설정 파일 지정
+    # 2. 3D PointCloud (/points_raw) -> 2D LaserScan (/scan) 변환 노드
+    start_pointcloud_to_laserscan_node = Node(
+        package='pointcloud_to_laserscan',
+        executable='pointcloud_to_laserscan_node',
+        name='pointcloud_to_laserscan',
+        output='screen',
+        parameters=[{
+            'target_frame': 'velodyne_link',
+            'transform_tolerance': 0.01,
+            'min_height': -0.3,
+            'max_height': 1.0,
+            'angle_min': -3.14159,
+            'angle_max': 3.14159,
+            'angle_increment': 0.0087,
+            'scan_time': 0.1,
+            'range_min': 0.3,
+            'range_max': 20.0,
+            'use_sim_time': True
+        }],
+        remappings=[
+            ('cloud_in', '/points_raw'),
+            ('scan', '/scan')
+        ]
+    )
+
+    # 3. SLAM Toolbox 설정 파일 지정
     slam_config_file = os.path.join(pkg_hunter_gazebo, 'config', 'mapper_params_online_async.yaml')
 
-    # 3. slam_toolbox 노드 실행
+    # 4. slam_toolbox 노드 실행
     start_async_slam_toolbox_node = Node(
         package='slam_toolbox',
         executable='async_slam_toolbox_node',
@@ -130,6 +155,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         launch_sim,
+        start_pointcloud_to_laserscan_node,
         start_async_slam_toolbox_node
     ])
 ```

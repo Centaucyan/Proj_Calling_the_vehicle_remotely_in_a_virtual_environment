@@ -62,7 +62,8 @@ git submodule update --init --recursive
   ros-humble-image-transport-plugins \
   ros-humble-rviz2 \
   ros-humble-slam-toolbox \
-  ros-humble-nav2-map-server
+  ros-humble-nav2-map-server \
+  ros-humble-pointcloud-to-laserscan
 ---
 
 ## 5. Execute Commands
