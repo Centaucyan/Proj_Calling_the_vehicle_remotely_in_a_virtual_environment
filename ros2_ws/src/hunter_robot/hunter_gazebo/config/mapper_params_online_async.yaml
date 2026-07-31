@@ -1,7 +1,8 @@
 slam_toolbox:
   ros__parameters:
     # Solver settings
-    solver_plugin: solver_plugins::CspaSolver
+    # solver_plugin: solver_plugins::CspaSolver
+    solver_plugin: solver_plugins::CeresSolver
     ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
     ceres_preconditioner: SCHUR_JACOBI
     ceres_trust_strategy: LEVENBERG_MARQUARDT

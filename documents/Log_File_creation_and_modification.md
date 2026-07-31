@@ -50,6 +50,10 @@
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/CMakeLists.txt`
    * **수정 내용:** 빌드 시 `worlds` 및 `maps` 디렉토리가 포함되어 설치되도록 `install(DIRECTORY config launch worlds maps DESTINATION share/${PROJECT_NAME})` 타겟 수정 (Step 03, Step 04)
 
+7. **controllers.yaml**
+   * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/controllers.yaml`
+   * **수정 내용:** SLAM 및 Nav2 오도메트리 TF 변환 브로드캐스팅을 위해 `enable_odom_tf` 파라미터를 `false`에서 `true`로 변경 (Step 04)
+
 ---
 
 ### 3. 📦 원본 클론 유지 디렉토리 (Original Cloned Directories)

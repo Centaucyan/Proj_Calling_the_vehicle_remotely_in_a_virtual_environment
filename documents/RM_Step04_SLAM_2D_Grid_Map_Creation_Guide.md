@@ -19,7 +19,7 @@
 
 - **OS:** Ubuntu 22.04 LTS (Jammy Jellyfish)
 - **ROS 2:** Humble Hawksbill
-- **필수 ROS2 패키지:** `slam-toolbox`, `nav2-map-server`
+- **필수 ROS2 패키지:** `slam-toolbox`, `nav2-map-server`, `pointcloud-to-laserscan`
 - **SLAM 설정 파일 생성 경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/mapper_params_online_async.yaml`
 - **SLAM 매핑 런치 파일 생성 경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/slam_mapping.launch.py`
 - **최종 지도 저장 경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/maps/parking_garage_map.yaml` (.pgm)
@@ -39,8 +39,24 @@ sudo apt install -y ros-humble-slam-toolbox ros-humble-nav2-map-server ros-humbl
 
 ---
 
-### 3.2. [Step 4.2] `slam_toolbox` 파라미터 파일 신규 작성 (`mapper_params_online_async.yaml`)
+### 3.2. [Step 4.2] 컨트롤러 설정 및 `slam_toolbox` 파라미터 파일 작성
 
+#### 1) 로봇 컨트롤러 오도메트리 TF 발행 설정 확인 (사전점검 필수 🌟)
+`slam_toolbox`가 정상 구동되어 `odom` -> `base_link` 및 `map` -> `odom` TF 트리를 형성하려면 로봇 컨트롤러의 오도메트리 TF 발행 옵션이 `true`로 켜져 있어야 합니다. (프로젝트 전체 자율주행 단계에서 항상 `true`로 유지합니다.)
+
+* **파일 위치:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/controllers.yaml`
+* **33번 줄 확인 및 수정:**
+
+```yaml
+diff_drive_controller:
+  ros__parameters:
+    ...
+    odom_frame_id: odom
+    base_frame_id: base_link
+    enable_odom_tf: true  # 👈 반드시 true로 설정 (false일 경우 odom/map TF 미생성)
+```
+
+#### 2) `slam_toolbox` 파라미터 파일 신규 작성 (`mapper_params_online_async.yaml`)
 AgileX Hunter의 센서 프레임(`base_link`, `odom`, `/scan`)에 맞춰 `slam_toolbox` 파라미터 설정을 구성합니다.
 
 * **파일 위치:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/mapper_params_online_async.yaml`
@@ -49,7 +65,7 @@ AgileX Hunter의 센서 프레임(`base_link`, `odom`, `/scan`)에 맞춰 `slam_
 slam_toolbox:
   ros__parameters:
     # Solver settings
-    solver_plugin: solver_plugins::CspaSolver
+    solver_plugin: solver_plugins::CeresSolver
     ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
     ceres_preconditioner: SCHUR_JACOBI
     ceres_trust_strategy: LEVENBERG_MARQUARDT
@@ -196,8 +212,8 @@ rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
 ```
 * **RViz2 디스플레이 설정 방법:**
   - RViz2 좌측 Displays 패널 하단 `Add` 버튼 클릭
-  - `By topic` 탭에서 `/map` 토픽 하위의 `Map` 선택 후 `OK` 클릭
-  - Fixed Frame이 `map` (또는 `odom`)으로 설정되어 있는지 확인하고, 차량 이동에 따라 실시간 2D 격자 지도가 확장되는지 모니터링합니다.
+  - `By topic` 탭에서 `/map` 토픽 하위의 `Map` 선택 후 `OK` 클릭 (또는 `By display type` 탭에서 `Map` 추가 후 Topic을 `/map`으로 입력)
+  - Fixed Frame을 `map` (또는 `odom`)으로 설정하고, 차량 이동에 따라 실시간 2D 격자 지도가 확장되는지 모니터링합니다.
 
 #### 3) [터미널 3] 키보드 제어로 주차장 전체 구역 조종 주행
 ```bash
@@ -216,7 +232,17 @@ ros2 run nav2_map_server map_saver_cli -f src/hunter_robot/hunter_gazebo/maps/pa
 
 ---
 
-## 4. 검증 및 결과 확인
+## 4. 검증 및 트러블슈팅 (Troubleshooting)
 
+### 4.1. 결과 검증
 1. **RViz2 시각화 검증:** `Map` 디스플레이를 추가하여 `/map` 토픽의 2D 점유 격자 지도가 기둥과 외벽을 정확한 직선/직각형태로 표현하는지 확인
 2. **맵 저장 파일 검증:** `parking_garage_map.pgm` 이미지 파일을 열어 외벽 및 4개의 기둥 장애물이 왜곡 없이 뚜렷하게 맵화되었는지 확인
+
+### 4.2. 트러블슈팅 가이드
+* **문제 1: RViz2 Fixed Frame 목록에 `odom`이나 `map`이 표시되지 않고 `/map` 토픽이 생성되지 않는 경우**
+  - **원인:** `hunter_gazebo/config/controllers.yaml` 내 `enable_odom_tf` 옵션이 `false`로 꺼져 있어 `odom` -> `base_link` TF가 브로드캐스팅되지 않음.
+  - **해결:** `controllers.yaml` 파일 내 `enable_odom_tf: true`로 수정 후 패키지 재빌드 및 시뮬레이션 재실행.
+
+* **문제 2: RViz2에서 PointCloud2는 표시되지만 SLAM 지도가 업데이트되지 않는 경우**
+  - **원인:** 3D PointCloud 데이터(`/points_raw`)를 2D 스캔 데이터(`/scan`)로 변환하는 `pointcloud_to_laserscan` 노드가 미구동됨.
+  - **해결:** `slam_mapping.launch.py` 런치 파일에 `pointcloud_to_laserscan_node`가 등록되어 있는지 확인하고 `ros2 topic echo /scan`으로 데이터 출력 여부 점검.
