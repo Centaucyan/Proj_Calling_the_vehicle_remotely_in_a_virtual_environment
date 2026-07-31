@@ -63,7 +63,10 @@ git submodule update --init --recursive
   ros-humble-rviz2 \
   ros-humble-slam-toolbox \
   ros-humble-nav2-map-server \
-  ros-humble-pointcloud-to-laserscan
+  ros-humble-pointcloud-to-laserscan \
+  ros-humble-ackermann-steering-controller \
+  ros-humble-ackermann-msgs \
+  ros-humble-steering-controllers-library
 ---
 
 ## 5. Execute Commands

@@ -16,11 +16,15 @@
 
 3. **mapper_params_online_async.yaml**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/mapper_params_online_async.yaml`
-   * **설명:** `slam_toolbox` 연동을 위한 SLAM 파라미터 설정 파일 (센서 토픽 `/scan`, 프레임 `base_link`, `odom`, `map` 및 루프 클로저 설정) (Step 04)
+   * **설명:** `slam_toolbox` 연동을 위한 SLAM 파라미터 설정 파일 (센서 토픽 `/scan`, 프레임 `base_link`, `odom`, `map` 및 CeresSolver 설정) (Step 04)
 
 4. **slam_mapping.launch.py**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/slam_mapping.launch.py`
    * **설명:** Gazebo 주차장 월드 구동과 `slam_toolbox` 노드를 동시에 실행하는 SLAM 통합 런치 스크립트 (Step 04)
+
+5. **ackermann_controllers.yaml**
+   * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/ackermann_controllers.yaml`
+   * **설명:** Hunter 2.0 물리 제원(축거 0.65m, 윤거 0.57m)을 반영한 아커만 전용 컨트롤러(`ackermann_steering_controller`) 설정 신규 파일 (Step 02/Step 04)
 
 ---
 
@@ -38,21 +42,21 @@
    * **경로:** `ros2_ws/src/hunter_robot/hunter_description/description/wheel.urdf.xacro`
    * **수정 내용:** 바퀴 접지 위치 및 조향 축 오프셋 조정 (Step 01, Step 02)
 
-4. **launch_sim.launch.py**
-   * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/launch_sim.launch.py`
-   * **수정 내용:** `parking_garage.world` 지정 및 차량 시작 위치`(0, -8, 0.25)` 파라미터 추가 (Step 01, Step 03)
+4. **ros2_control.xacro**
+   * **경로:** `ros2_ws/src/hunter_robot/hunter_description/description/ros2_control.xacro`
+   * **수정 내용:** 전륜 조향 관절(`front_left_steering_joint`, `front_right_steering_joint`) 위치 제어 인터페이스 등록 및 `ackermann_controllers.yaml` 파일 연결 (Step 02)
 
-5. **view_hunter.rviz**
+5. **launch_sim.launch.py**
+   * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/launch_sim.launch.py`
+   * **수정 내용:** `parking_garage.world` 지정, 시작 위치`(0, -8, 0.25)` 파라미터 추가 및 `ackermann_steering_controller` 스포너 노드 적용 (Step 01, Step 02, Step 03)
+
+6. **view_hunter.rviz**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/view_hunter.rviz`
    * **수정 내용:** LiDAR PointCloud 및 Camera Image 시각화 디스플레이 설정 업데이트 (Step 02, Step 03)
 
-6. **CMakeLists.txt**
+7. **CMakeLists.txt**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/CMakeLists.txt`
    * **수정 내용:** 빌드 시 `worlds` 및 `maps` 디렉토리가 포함되어 설치되도록 `install(DIRECTORY config launch worlds maps DESTINATION share/${PROJECT_NAME})` 타겟 수정 (Step 03, Step 04)
-
-7. **controllers.yaml**
-   * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/controllers.yaml`
-   * **수정 내용:** SLAM 및 Nav2 오도메트리 TF 변환 브로드캐스팅을 위해 `enable_odom_tf` 파라미터를 `false`에서 `true`로 변경 (Step 04)
 
 ---
 

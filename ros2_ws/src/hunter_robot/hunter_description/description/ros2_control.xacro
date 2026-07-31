@@ -48,10 +48,11 @@
 
         <!-- [수정/추가 코드] teleop_twist_keyboard 및 /odom 표준 토픽 연동을 위한 <ros><remapping> 추가 -->
         <plugin name="gazebo_ros2_control_hunter" filename="libgazebo_ros2_control.so">
-            <parameters>$(find hunter_gazebo)/config/controllers.yaml</parameters>
+            <!-- 🌟 새로 만든 ackermann_controllers.yaml 파일로 경로 지정 -->
+            <parameters>$(find hunter_gazebo)/config/ackermann_controllers.yaml</parameters>
             <ros>
-                <remapping>/diff_drive_controller/cmd_vel_unstamped:=/cmd_vel</remapping>
-                <remapping>/diff_drive_controller/odom:=/odom</remapping>
+                <remapping>/ackermann_steering_controller/reference_unstamped:=/cmd_vel</remapping>
+                <remapping>/ackermann_steering_controller/tf_odometry:=/tf</remapping>
             </ros>
         </plugin>
     </gazebo>

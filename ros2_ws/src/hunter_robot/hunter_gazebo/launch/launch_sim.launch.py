@@ -53,10 +53,17 @@ def generate_launch_description():
                         output='screen')
 
 
-    diff_drive_spawner = Node(
+    # diff_drive_spawner = Node(
+    #     package="controller_manager",
+    #     executable="spawner",
+    #     arguments=["diff_drive_controller"],
+    # )
+
+    # [수정 코드] 아커만 스포너 노드로 지정 🌟
+    ackermann_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["diff_drive_controller"],
+        arguments=["ackermann_steering_controller"],
     )
 
     joint_broad_spawner = Node(
@@ -71,6 +78,7 @@ def generate_launch_description():
         rsp,
         gazebo,
         spawn_entity,
-        diff_drive_spawner,
+        # diff_drive_spawner,
+        ackermann_spawner,  #. 아커만 스포너 적용
         joint_broad_spawner
     ])

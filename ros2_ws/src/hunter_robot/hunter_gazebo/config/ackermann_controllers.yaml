@@ -1,0 +1,45 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50
+    use_sim_time: true
+
+    ackermann_steering_controller:
+      type: ackermann_steering_controller/AckermannSteeringController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+ackermann_steering_controller:
+  ros__parameters:
+    # 휠 및 조향 관절 지정
+    rear_wheels_names: ["back_left_wheel_joint", "back_right_wheel_joint"]
+    front_wheels_names: ["front_left_steering_joint", "front_right_steering_joint"]
+
+    # Hunter 2.0 물리 제원 파라미터 (단위: 미터)
+    wheelbase: 0.65                  # 축거 (전륜-후륜 중심 거리)
+    front_wheel_track: 0.57          # 전륜 윤거 (좌-우 바퀴 거리)
+    rear_wheel_track: 0.57           # 후륜 윤거 (좌-우 바퀴 거리)
+    front_wheels_radius: 0.1651      # 바퀴 반지름
+    rear_wheels_radius: 0.1651       # 바퀴 반지름
+
+    # 프레임 및 TF 설정
+    odom_frame_id: odom
+    base_frame_id: base_link
+    enable_odom_tf: true             # 👈 odom -> base_link TF 브로드캐스팅
+
+    # 제어 및 토픽 옵션
+    publish_rate: 50.0
+    open_loop: false
+    use_stamped_vel: false
+
+    # 속도 및 조향 각도 제한
+    linear.x.has_velocity_limits: true
+    linear.x.max_velocity: 1.5
+    linear.x.min_velocity: -1.0
+    linear.x.has_acceleration_limits: true
+    linear.x.max_acceleration: 1.0
+
+    angular.z.has_velocity_limits: true
+    angular.z.max_velocity: 0.6      # 최대 조향각 (약 35도)
+    angular.z.has_acceleration_limits: true
+    angular.z.max_acceleration: 1.0
