@@ -29,7 +29,8 @@
       <collision>
         <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
         <geometry>
-          <!-- <cylinder length="${wheel_length}" radius="${wheel_radius}" /> -->
+          <!-- [기존 코드] <cylinder length="${wheel_length}" radius="${wheel_radius}" /> -->
+          <!-- [수정 코드] 메쉬 크기(0.6)에 맞춰 충돌체 크기 비율 조정 -->
           <cylinder length="${wheel_length * 0.6}" radius="${wheel_radius * 0.6}" />
         </geometry>
       </collision>
@@ -47,7 +48,7 @@
       <mu2 value="0.5"/>
       <kp value="10000000.0" />
       <kd value="1.0" />
-      <fdir1 value="1 0 0"/>
+      <!-- <fdir1 value="1 0 0"/> -->
     </gazebo>
   </xacro:if>
 
@@ -59,6 +60,63 @@
       <axis xyz="0 1 0" rpy="0 0 0" />
     </joint>
   </xacro:unless>
-
   </xacro:macro>
+
+
+    <!-- [새로 추가: 전륜 조향 바퀴 매크로 - Z축 조향 관절 + Y축 구동 관절] 🌟 -->
+  <xacro:macro name="hunter_steering_wheel" params="wheel_prefix x y z roll:=0.0 pitch:=0.0 yaw:=0.0 is_sim:=true">
+    
+    <!-- 조향 킹핀 링크 (Dummy Steering Link) -->
+    <link name="${wheel_prefix}_steering_link">
+      <inertial>
+        <mass value="0.5" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+      </inertial>
+    </link>
+    <!-- 1. Z축 조향 관절 (base_link -> steering_link) -->
+    <joint name="${wheel_prefix}_steering_joint" type="revolute">
+      <parent link="base_link"/>
+      <child link="${wheel_prefix}_steering_link"/>
+      <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-1.2" upper="1.2" effort="100.0" velocity="2.0"/>
+      <dynamics damping="1.0" friction="0.1"/>
+    </joint>
+    <!-- 바퀴 링크 -->
+    <link name="${wheel_prefix}_wheel">
+      <inertial>
+        <mass value="2.637" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.02467" ixy="0" ixz="0" iyy="0.04411" iyz="0" izz="0.02467" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="file://$(find hunter_description)/meshes/wheel.dae" scale="0.6 0.6 0.6"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+        <geometry>
+          <cylinder length="${wheel_length * 0.6}" radius="${wheel_radius * 0.6}" />
+        </geometry>
+      </collision>
+    </link>
+    <!-- 2. Y축 바퀴 회전 관절 (steering_link -> wheel) -->
+    <joint name="${wheel_prefix}_wheel_joint" type="continuous">
+      <parent link="${wheel_prefix}_steering_link"/>
+      <child link="${wheel_prefix}_wheel"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+    <gazebo reference="${wheel_prefix}_wheel">
+      <mu1 value="0.5"/>
+      <mu2 value="0.5"/>
+      <kp value="10000000.0" />
+      <kd value="1.0" />
+      <!-- <fdir1 value="1 0 0"/> -->
+    </gazebo>
+  </xacro:macro>
+  
 </robot>

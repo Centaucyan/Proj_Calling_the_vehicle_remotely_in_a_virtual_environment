@@ -21,7 +21,11 @@ def generate_launch_description():
     robot_description_config = xacro.process_file(xacro_file)
     
     # Create a robot_state_publisher node
-    params = {'robot_description': robot_description_config.toxml(), 'use_sim_time': use_sim_time}
+    # params = {'robot_description': robot_description_config.toxml(), 'use_sim_time': use_sim_time}
+    doc_xml = robot_description_config.toxml()
+    import re
+    doc_xml = re.sub(r'<!--.*?-->', '', doc_xml, flags=re.DOTALL)  # XML 주석 제거로 Gazebo 파싱 버그 방지
+    params = {'robot_description': doc_xml, 'use_sim_time': use_sim_time}
     node_robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',

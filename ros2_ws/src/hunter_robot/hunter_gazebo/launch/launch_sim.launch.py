@@ -64,6 +64,9 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner",
         arguments=["ackermann_steering_controller"],
+        remappings=[
+            ("/ackermann_steering_controller/reference_unstamped", "/cmd_vel"),
+        ]
     )
 
     joint_broad_spawner = Node(

@@ -52,7 +52,8 @@
     <link name="${prefix}base_footprint"/>
 
     <joint name="${prefix}base_footprint_joint" type="fixed">
-      <origin xyz="0 0 ${wheel_vertical_offset - wheel_radius}" rpy="0 0 0" />
+      <!-- <origin xyz="0 0 ${wheel_vertical_offset - wheel_radius}" rpy="0 0 0" /> -->
+      <origin xyz="0 0 ${wheel_vertical_offset - wheel_radius * 0.6}" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}base_footprint" />
     </joint>
@@ -73,9 +74,14 @@
     </joint>
 
     
+    <!-- 기존 코드 -->
+    <!-- <xacro:hunter_wheel wheel_prefix="${prefix}front_left" x="${wheelbase/2}" y="${track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
+    <xacro:hunter_wheel wheel_prefix="${prefix}front_right" x="${wheelbase/2}" y="${-track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/> -->
 
-    <xacro:hunter_wheel wheel_prefix="${prefix}front_left" x="${wheelbase/2}" y="${track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
-    <xacro:hunter_wheel wheel_prefix="${prefix}front_right" x="${wheelbase/2}" y="${-track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
+    <!-- [수정/추가 코드] 전륜 바퀴 2개는 조향 매크로(hunter_steering_wheel) 사용 for Ackermann steering -->
+    <xacro:hunter_steering_wheel wheel_prefix="${prefix}front_left" x="${wheelbase/2}" y="${track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
+    <xacro:hunter_steering_wheel wheel_prefix="${prefix}front_right" x="${wheelbase/2}" y="${-track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
+    <!-- 후륜 바퀴 (속도 제어) -->
     <xacro:hunter_wheel wheel_prefix="${prefix}back_left" x="${-wheelbase/2}" y="${track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
     <xacro:hunter_wheel wheel_prefix="${prefix}back_right" x="${-wheelbase/2}" y="${-track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
 </xacro:macro>

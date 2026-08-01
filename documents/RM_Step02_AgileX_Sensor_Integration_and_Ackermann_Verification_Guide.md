@@ -189,7 +189,7 @@ sudo apt install -y \
 
 ### 3.3. [Step 2.3] 아커만 전용 컨트롤러 구축 (`ackermann_controllers.yaml`) 🌟
 
-기존 원본 `controllers.yaml`은 유지하고, Hunter 2.0 물리 제원(축거 0.65m, 윤거 0.57m)을 정확히 반영하는 신규 아커만 제어 파라미터를 구축합니다.
+기존 원본 `controllers.yaml`은 유지하고, Hunter 2.0 물리 제원(축거 `0.512m`, 윤거 `0.4908m`, 바퀴 반지름 `0.09906m`)을 정확히 반영하는 신규 아커만 제어 파라미터를 구축합니다.
 
 #### 1) `ackermann_controllers.yaml` 신규 작성
 * **파일 위치:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/ackermann_controllers.yaml`
@@ -211,11 +211,11 @@ ackermann_steering_controller:
     rear_wheels_names: ["back_left_wheel_joint", "back_right_wheel_joint"]
     front_wheels_names: ["front_left_steering_joint", "front_right_steering_joint"]
 
-    wheelbase: 0.65                  # 축거 (전륜-후륜 거리)
-    front_wheel_track: 0.57          # 전륜 윤거 (좌-우 바퀴 거리)
-    rear_wheel_track: 0.57           # 후륜 윤거 (좌-우 바퀴 거리)
-    front_wheels_radius: 0.1651      # 바퀴 반지름
-    rear_wheels_radius: 0.1651       # 바퀴 반지름
+    wheelbase: 0.512                  # 축거 (전륜-후륜 중심 거리 실측값)
+    front_wheel_track: 0.4908          # 전륜 윤거 (좌-우 바퀴 거리 실측값)
+    rear_wheel_track: 0.4908           # 후륜 윤거 (좌-우 바퀴 거리 실측값)
+    front_wheels_radius: 0.09906      # 바퀴 반지름 (0.1651 * 0.6 실측값)
+    rear_wheels_radius: 0.09906       # 바퀴 반지름 (0.1651 * 0.6 실측값)
 
     odom_frame_id: odom
     base_frame_id: base_link
@@ -224,6 +224,7 @@ ackermann_steering_controller:
     publish_rate: 50.0
     open_loop: false
     use_stamped_vel: false
+    cmd_vel_timeout: 1.0             # 키보드 신호 끊김 방지 타임아웃
 
     linear.x.has_velocity_limits: true
     linear.x.max_velocity: 1.5
@@ -232,7 +233,7 @@ ackermann_steering_controller:
     linear.x.max_acceleration: 1.0
 
     angular.z.has_velocity_limits: true
-    angular.z.max_velocity: 0.6      # 최대 조향각
+    angular.z.max_velocity: 1.0      # 허용 조향 각도 (1.0 rad)
     angular.z.has_acceleration_limits: true
     angular.z.max_acceleration: 1.0
 ```
@@ -249,24 +250,31 @@ ackermann_steering_controller:
             <plugin>gazebo_ros2_control/GazeboSystem</plugin>
         </hardware>
 
-        <joint name="back_left_wheel_joint">
-            <command_interface name="velocity"/>
-            <state_interface name="velocity"/>
-            <state_interface name="position"/>
-        </joint>
-        <joint name="back_right_wheel_joint">
-            <command_interface name="velocity"/>
-            <state_interface name="velocity"/>
-            <state_interface name="position"/>
-        </joint>
-
-        <!-- 전륜 조향 관절 포지션 제어 추가 -->
         <joint name="front_left_steering_joint">
             <command_interface name="position"/>
             <state_interface name="position"/>
         </joint>
+        
         <joint name="front_right_steering_joint">
             <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="back_right_wheel_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+        
+        <joint name="back_left_wheel_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="velocity"/>
             <state_interface name="position"/>
         </joint>
     </ros2_control>
@@ -301,6 +309,90 @@ ackermann_steering_controller:
         ackermann_spawner,
         joint_broad_spawner
     ])
+```
+
+#### 4) `wheel.urdf.xacro` 전륜 Z축 조향 관절 및 마찰력 보정 🌟
+* **파일 위치:** `ros2_ws/src/hunter_robot/hunter_description/description/wheel.urdf.xacro`
+* **수정 내용**: 전륜 조향 매크로(`hunter_steering_wheel`) 추가, 조향 관절 한계값(`limit lower="-1.2" upper="1.2"`), 감쇄(`damping="1.0"`), 마찰축(`fdir1`) 제거 및 마찰력(`0.5`) 적용.
+
+```xml
+  <xacro:macro name="hunter_steering_wheel" params="wheel_prefix x y z roll:=0.0 pitch:=0.0 yaw:=0.0 is_sim:=true">
+    <link name="${wheel_prefix}_steering_link">
+      <inertial>
+        <mass value="0.5" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+      </inertial>
+    </link>
+    <joint name="${wheel_prefix}_steering_joint" type="revolute">
+      <parent link="base_link"/>
+      <child link="${wheel_prefix}_steering_link"/>
+      <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-1.2" upper="1.2" effort="100.0" velocity="2.0"/>
+      <dynamics damping="1.0" friction="0.1"/>
+    </joint>
+    <link name="${wheel_prefix}_wheel">
+      <inertial>
+        <mass value="2.637" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.02467" ixy="0" ixz="0" iyy="0.04411" iyz="0" izz="0.02467" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="file://$(find hunter_description)/meshes/wheel.dae" scale="0.6 0.6 0.6"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+        <geometry>
+          <cylinder length="${wheel_length * 0.6}" radius="${wheel_radius * 0.6}" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${wheel_prefix}_wheel_joint" type="continuous">
+      <parent link="${wheel_prefix}_steering_link"/>
+      <child link="${wheel_prefix}_wheel"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+    <gazebo reference="${wheel_prefix}_wheel">
+      <mu1 value="0.5"/>
+      <mu2 value="0.5"/>
+      <kp value="10000000.0" />
+      <kd value="1.0" />
+    </gazebo>
+  </xacro:macro>
+```
+
+#### 5) `hunter_core.urdf.xacro` 조향 바퀴 매크로 적용 및 지면 오프셋 보정 🌟
+* **파일 위치:** `ros2_ws/src/hunter_robot/hunter_description/description/hunter_core.urdf.xacro`
+* **수정 내용**: 56번째 줄 `base_footprint_joint` 오프셋(`${wheel_vertical_offset - wheel_radius * 0.6}`) 정밀 지면 착지 보정 및 전륜 바퀴 2개에 `hunter_steering_wheel` 적용.
+
+```xml
+    <joint name="${prefix}base_footprint_joint" type="fixed">
+      <origin xyz="0 0 ${wheel_vertical_offset - wheel_radius * 0.6}" rpy="0 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}base_footprint" />
+    </joint>
+...
+    <xacro:hunter_steering_wheel wheel_prefix="${prefix}front_left" x="${wheelbase/2}" y="${track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
+    <xacro:hunter_steering_wheel wheel_prefix="${prefix}front_right" x="${wheelbase/2}" y="${-track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
+    <xacro:hunter_wheel wheel_prefix="${prefix}back_left" x="${-wheelbase/2}" y="${track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
+    <xacro:hunter_wheel wheel_prefix="${prefix}back_right" x="${-wheelbase/2}" y="${-track/2}" z="${wheel_vertical_offset}" is_sim="${is_sim}"/>
+```
+
+#### 6) `rsp.launch.py` Gazebo 파싱 버그 예방 코드 추가 🌟
+* **파일 위치:** `ros2_ws/src/hunter_robot/hunter_description/launch/rsp.launch.py`
+* **수정 내용**: 24번째 줄 `node_robot_state_publisher` 전달 전 `robot_description` XML 주석 내 `--` 문제로 인한 `gazebo_ros2_control` rcl 파서 에러 예방 로직 추가.
+
+```python
+    # Create a robot_state_publisher node
+    doc_xml = robot_description_config.toxml()
+    import re
+    doc_xml = re.sub(r'<!--.*?-->', '', doc_xml, flags=re.DOTALL)
+    params = {'robot_description': doc_xml, 'use_sim_time': use_sim_time}
 ```
 
 ---

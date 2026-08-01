@@ -49,3 +49,13 @@ Gazebo 시뮬레이터 상의 가상 주차장 월드(`parking_garage.world`)는
 ## 5. 향후 개선 방향 (Future Improvement)
 
 * **Step 05 (Nav2 자율주행 구축 시):** 차동 구동 플래너 대신 아커만 조향 제원(최소 회전 반경 제약)을 엄격히 준수하는 **`TEB Local Planner`** 또는 **`Regulated Pure Pursuit Controller`**를 연동하여 정밀한 주행 궤적 및 위치 추정 확보 예정.
+
+---
+
+## 6. 최종 조치 결과 및 종결 (Final Resolution - 2026-08-01)
+
+* **상태:** **[해결 완료 (Resolved)]**
+* **조치 내용:** 
+  1. `hunter_gazebo` 기본 제어기를 기존 차동 구동(`diff_drive`)에서 **`ackermann_steering_controller`**로 전면 전환 완료.
+  2. URDF 상에 전륜 Z축 조향 관절(`steering_joint`, `limit lower="-1.2" upper="1.2"`) 및 킹핀 링크를 구현하여 실제 조향각이 오도메트리 파라미터(축거 `0.512m`, 윤거 `0.4908m`, 바퀴 반지름 `0.09906m`)와 100% 일치하도록 보정 완료.
+  3. Gazebo 물리 마찰축(`fdir1`) 제거 및 차체 지지 오프셋 보정으로 회전 시 바퀴 슬립과 오도메트리 드리프트 현상을 근본적으로 해결함.

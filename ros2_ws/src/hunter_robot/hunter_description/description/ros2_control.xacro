@@ -5,7 +5,9 @@
         <hardware>
             <plugin>gazebo_ros2_control/GazeboSystem</plugin>
         </hardware>
-        <joint name="front_right_wheel_joint">
+
+        <!-- [기존코드] 후륜 구동 바퀴 (속도 제어: velocity) -->
+        <!-- <joint name="front_right_wheel_joint">
             <command_interface name="velocity">
                 <param name="min">-10</param>
                 <param name="max">10</param>
@@ -20,7 +22,20 @@
             </command_interface>
             <state_interface name="velocity"/>
             <state_interface name="position"/>
+        </joint> -->
+    
+        <!-- [추가 코드 for 아크만 조향] 전륜 조향 관절 (각도 제어: position 추가) 🌟 -->
+        <joint name="front_left_steering_joint">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
         </joint>
+        
+        <joint name="front_right_steering_joint">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>    
+
+        <!-- 후륜 구동 바퀴 (속도 제어: velocity) -->
         <joint name="back_right_wheel_joint">
             <command_interface name="velocity">
                 <param name="min">-10</param>
@@ -50,6 +65,7 @@
         <plugin name="gazebo_ros2_control_hunter" filename="libgazebo_ros2_control.so">
             <!-- 🌟 새로 만든 ackermann_controllers.yaml 파일로 경로 지정 -->
             <parameters>$(find hunter_gazebo)/config/ackermann_controllers.yaml</parameters>
+            <!-- 🌟 /cmd_vel 토픽을 아커만 컨트롤러로 자동 연결하는 리매핑 추가 -->
             <ros>
                 <remapping>/ackermann_steering_controller/reference_unstamped:=/cmd_vel</remapping>
                 <remapping>/ackermann_steering_controller/tf_odometry:=/tf</remapping>

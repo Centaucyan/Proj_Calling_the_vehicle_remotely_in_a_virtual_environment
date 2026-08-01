@@ -36,25 +36,29 @@
 
 2. **hunter_core.urdf.xacro**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_description/description/hunter_core.urdf.xacro`
-   * **수정 내용:** 차체 지상고 오프셋 및 오도메트리 파라미터 미세 조정 (Step 01, Step 02)
+   * **수정 내용:** `base_footprint_joint` 오프셋을 축소된 바퀴 반지름 비율(`wheel_radius * 0.6`)로 보정하여 지면 착지 완벽 동기화 (Step 01, Step 02, Step 04)
 
 3. **wheel.urdf.xacro**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_description/description/wheel.urdf.xacro`
-   * **수정 내용:** 바퀴 접지 위치 및 조향 축 오프셋 조정 (Step 01, Step 02)
+   * **수정 내용:** 전륜 Z축 조향 관절(`steering_joint`, `limit lower="-1.2" upper="1.2"`) 및 킹핀 링크(`steering_link`) 신규 정의, 감쇄(`damping="1.0"`) 적용, 고정 마찰력 벡터(`fdir1`) 제거 및 수동 바퀴 마찰력(`mu1=0.5, mu2=0.5`) 보정 (Step 01, Step 02, Step 04)
 
 4. **ros2_control.xacro**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_description/description/ros2_control.xacro`
-   * **수정 내용:** 전륜 조향 관절(`front_left_steering_joint`, `front_right_steering_joint`) 위치 제어 인터페이스 등록 및 `ackermann_controllers.yaml` 파일 연결 (Step 02)
+   * **수정 내용:** 전륜 조향 관절 `position` 인터페이스 선언 및 `libgazebo_ros2_control` 플러그인 내 `/cmd_vel` 자동 연동 리매핑 태그 추가 (Step 02, Step 04)
 
 5. **launch_sim.launch.py**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/launch_sim.launch.py`
-   * **수정 내용:** `parking_garage.world` 지정, 시작 위치`(0, -8, 0.25)` 파라미터 추가 및 `ackermann_steering_controller` 스포너 노드 적용 (Step 01, Step 02, Step 03)
+   * **수정 내용:** `parking_garage.world` 지정, 시작 위치`(0, -8, 0.25)` 파라미터 추가 및 `ackermann_steering_controller` 스포너 노드 적용 (Step 01, Step 02, Step 03, Step 04)
 
-6. **view_hunter.rviz**
+6. **rsp.launch.py**
+   * **경로:** `ros2_ws/src/hunter_robot/hunter_description/launch/rsp.launch.py`
+   * **수정 내용:** Xacro 생성 XML 주석 내 `--` 문자로 인한 `gazebo_ros2_control` rcl 파서 에러 예방용 주석 제거 로직 추가 (Step 02, Step 04)
+
+7. **view_hunter.rviz**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/view_hunter.rviz`
    * **수정 내용:** LiDAR PointCloud 및 Camera Image 시각화 디스플레이 설정 업데이트 (Step 02, Step 03)
 
-7. **CMakeLists.txt**
+8. **CMakeLists.txt**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/CMakeLists.txt`
    * **수정 내용:** 빌드 시 `worlds` 및 `maps` 디렉토리가 포함되어 설치되도록 `install(DIRECTORY config launch worlds maps DESTINATION share/${PROJECT_NAME})` 타겟 수정 (Step 03, Step 04)
 
