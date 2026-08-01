@@ -76,15 +76,15 @@ def generate_launch_description():
     )
 
     # # [추가 코드] 미구동 앞바퀴 TF 표시용 Joint State Publisher (RViz2 에러 예방)
-    joint_state_publisher = Node(
-        package="joint_state_publisher",
-        executable="joint_state_publisher",
-        name="joint_state_publisher",
-        parameters=[{
-            "use_sim_time": True,
-            # "source_list": ["joint_states"]  # joint_state_broadcaster와 충돌 방지
-        }]
-    )
+    # joint_state_publisher = Node(
+    #     package="joint_state_publisher",
+    #     executable="joint_state_publisher",
+    #     name="joint_state_publisher",
+    #     parameters=[{
+    #         "use_sim_time": True,
+    #         # "source_list": ["joint_states"]  # joint_state_broadcaster와 충돌 방지
+    #     }]
+    # )
 
     # Launch them all!
     return LaunchDescription([
@@ -93,6 +93,6 @@ def generate_launch_description():
         spawn_entity,
         # diff_drive_spawner,
         ackermann_spawner,  #. 아커만 스포너 적용
-        joint_broad_spawner,
-        joint_state_publisher
+        joint_broad_spawner
+        # joint_state_publisher
     ])

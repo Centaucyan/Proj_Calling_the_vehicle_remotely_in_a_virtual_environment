@@ -7,22 +7,23 @@
         </hardware>
 
         <!-- [기존코드] 후륜 구동 바퀴 (속도 제어: velocity) -->
-        <!-- <joint name="front_right_wheel_joint">
-            <command_interface name="velocity">
+        <!-- 전륜 바퀴 (조향에 의해 굴러가는 passive joint) -->
+        <joint name="front_right_wheel_joint">
+            <!-- <command_interface name="velocity">
                 <param name="min">-10</param>
                 <param name="max">10</param>
-            </command_interface>
+            </command_interface> -->
             <state_interface name="velocity"/>
             <state_interface name="position"/>
         </joint>
         <joint name="front_left_wheel_joint">
-            <command_interface name="velocity">
+            <!-- <command_interface name="velocity">
                 <param name="min">-10</param>
                 <param name="max">10</param>
-            </command_interface>
+            </command_interface> -->
             <state_interface name="velocity"/>
             <state_interface name="position"/>
-        </joint> -->
+        </joint>
     
         <!-- [추가 코드 for 아크만 조향] 전륜 조향 관절 (각도 제어: position 추가) 🌟 -->
         <joint name="front_left_steering_joint">

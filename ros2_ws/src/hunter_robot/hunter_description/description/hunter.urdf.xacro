@@ -11,6 +11,6 @@
         <xacro:include filename="$(find hunter_description)/description/ros2_control.xacro" />
     </xacro:if>
     <xacro:unless value="$(arg use_ros2_control)">
-        <xacro:include filename="$(find hunter_description)/description/gazebo_control.xacro" />
+        <!-- <xacro:include filename="$(find hunter_description)/description/gazebo_control.xacro" /> -->
     </xacro:unless>
 </robot>

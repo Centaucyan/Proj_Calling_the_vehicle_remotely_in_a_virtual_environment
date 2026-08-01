@@ -42,10 +42,11 @@
       <child link="${wheel_prefix}_wheel"/>
       <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}"/>
       <axis xyz="0 1 0" rpy="0 0 0" />
+      <limit effort="100.0" velocity="20.0"/>
     </joint>
     <gazebo reference="${wheel_prefix}_wheel">
-      <mu1 value="10.0"/>   <!-- 0.5 -> 10.0 상향 -->
-      <mu2 value="10.0"/>   <!-- 0.5 -> 10.0 상향 -->
+      <mu1 value="100.0"/>   <!-- 0.5 -> 100.0 상향 -->
+      <mu2 value="100.0"/>   <!-- 0.5 -> 100.0 상향 -->
       <kp value="10000000.0" />
       <kd value="1.0" />
       <!-- <fdir1 value="1 0 0"/> -->
@@ -109,10 +110,11 @@
       <child link="${wheel_prefix}_wheel"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
+      <limit effort="100.0" velocity="20.0"/>
     </joint>
     <gazebo reference="${wheel_prefix}_wheel">
-      <mu1 value="10.0"/>   <!-- 0.5 -> 10.0 상향 🌟 -->
-      <mu2 value="10.0"/>   <!-- 0.5 -> 10.0 상향 🌟 -->
+      <mu1 value="100.0"/>   <!-- 10.0 -> 100.0 상향 (슬립 방지) 🌟 -->
+      <mu2 value="100.0"/>   <!-- 10.0 -> 100.0 상향 (슬립 방지) 🌟 -->
       <kp value="10000000.0" />
       <kd value="1.0" />
       <!-- <fdir1 value="1 0 0"/> -->

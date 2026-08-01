@@ -224,7 +224,7 @@ ackermann_steering_controller:
     enable_odom_tf: true             # 👈 odom -> base_link TF 필수 발행
 
     publish_rate: 50.0
-    open_loop: false
+    open_loop: true                  # 🌟 물리엔진 바퀴 슬립 무시, cmd_vel로 오도메트리 계산
     use_stamped_vel: false
     cmd_vel_timeout: 1.0             # 키보드 신호 끊김 방지 타임아웃
 
@@ -238,6 +238,15 @@ ackermann_steering_controller:
     angular.z.max_velocity: 1.0      # 허용 조향 각도 (1.0 rad)
     angular.z.has_acceleration_limits: true
     angular.z.max_acceleration: 1.0
+
+# 🌟 물리엔진 조향축 고정용 강력한 PID 게인 추가
+gazebo_ros2_control:
+  ros__parameters:
+    pid_gains:
+      front_left_steering_joint: {p: 100.0, i: 0.0, d: 1.0}
+      front_right_steering_joint: {p: 100.0, i: 0.0, d: 1.0}
+      back_left_wheel_joint: {p: 100.0, i: 0.0, d: 1.0}
+      back_right_wheel_joint: {p: 100.0, i: 0.0, d: 1.0}
 ```
 
 #### 2) `ros2_control.xacro` 전륜 조향 관절 등록 및 yaml 지정
@@ -259,6 +268,25 @@ ackermann_steering_controller:
         
         <joint name="front_right_steering_joint">
             <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <!-- 🌟 앞바퀴(전륜) 수동 관절(Passive) 추가: RViz2 시각화용 -->
+        <joint name="front_right_wheel_joint">
+            <!-- <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface> -->
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+        
+        <joint name="front_left_wheel_joint">
+            <!-- <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface> -->
+            <state_interface name="velocity"/>
             <state_interface name="position"/>
         </joint>
 
@@ -310,6 +338,7 @@ ackermann_steering_controller:
         spawn_entity,
         ackermann_spawner,
         joint_broad_spawner
+        # joint_state_publisher  # 🌟 더미 퍼블리셔 제거: TF 충돌(깜빡임) 예방
     ])
 ```
 
@@ -360,8 +389,8 @@ ackermann_steering_controller:
       <axis xyz="0 1 0"/>
     </joint>
     <gazebo reference="${wheel_prefix}_wheel">
-      <mu1 value="0.5"/>
-      <mu2 value="0.5"/>
+      <mu1 value="100.0"/>
+      <mu2 value="100.0"/>
       <kp value="10000000.0" />
       <kd value="1.0" />
     </gazebo>

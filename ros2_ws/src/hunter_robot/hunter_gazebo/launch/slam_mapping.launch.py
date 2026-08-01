@@ -24,7 +24,7 @@ def generate_launch_description():
         parameters=[{
             'target_frame': 'velodyne_link',
             'transform_tolerance': 0.01,
-            'min_height': -0.3,
+            'min_height': -0.1,  # 🌟 바닥(Z=0)이 스캔에 포함되어 장애물(검은색)로 인식되는 것을 막기 위해 상향 조정 (LiDAR Z=0.35)
             'max_height': 1.0,
             'angle_min': -3.14159,
             'angle_max': 3.14159,
