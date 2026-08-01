@@ -12,9 +12,9 @@ controller_manager:
 ackermann_steering_controller:
   ros__parameters:
     # 휠 및 조향 관절 지정
-    rear_wheels_names: ["back_left_wheel_joint", "back_right_wheel_joint"]
-    front_wheels_names: ["front_left_steering_joint", "front_right_steering_joint"]
-
+    rear_wheels_names: ["back_right_wheel_joint", "back_left_wheel_joint"]
+    front_wheels_names: ["front_right_steering_joint", "front_left_steering_joint"]
+    
     # Hunter 2.0 물리 제원 파라미터 (단위: 미터)
     wheelbase: 0.512                  # 축거 (전륜-후륜 중심 거리) 0.65 -> 0.512로 수정
     front_wheel_track: 0.4908          # 전륜 윤거 (좌-우 바퀴 거리) 0.57 -> 0.4908로 수정

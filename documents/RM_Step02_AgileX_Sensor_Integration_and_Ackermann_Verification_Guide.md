@@ -208,8 +208,10 @@ controller_manager:
 
 ackermann_steering_controller:
   ros__parameters:
-    rear_wheels_names: ["back_left_wheel_joint", "back_right_wheel_joint"]
-    front_wheels_names: ["front_left_steering_joint", "front_right_steering_joint"]
+    # ⚠️ 주의: ROS 2 ackermann_steering_controller는 배열의 [0]을 우측, [1]을 좌측으로 내부 매핑합니다.
+    # 반드시 [Right, Left] 순서로 기입해야 기하학이 깨지지 않고 부드럽게 조향됩니다.
+    rear_wheels_names: ["back_right_wheel_joint", "back_left_wheel_joint"]
+    front_wheels_names: ["front_right_steering_joint", "front_left_steering_joint"]
 
     wheelbase: 0.512                  # 축거 (전륜-후륜 중심 거리 실측값)
     front_wheel_track: 0.4908          # 전륜 윤거 (좌-우 바퀴 거리 실측값)
@@ -444,3 +446,10 @@ ros2 topic echo /odom
 * **문제 2: 아커만 조향 시 차체가 회전하지 않는 경우**
   - **원인:** `ros2_control.xacro` 파일 내 전륜 조향 관절(`front_left_steering_joint`, `front_right_steering_joint`)의 position 인터페이스 선언 누락.
   - **해결:** `ros2_control.xacro`에 전륜 관절 position command_interface 등록 확인.
+
+* **문제 3: 조향 시 타이어 방향은 맞는데 차체가 반대로 회전하거나, 회전 시 바퀴가 끌리며 덜컹거리는 경우**
+  - **증상:** `teleop` 조종 시 직진 좌/우회전 방향이 반대로 먹거나, 회전 자체는 되지만 몹시 부자연스럽고 슬립이 발생함.
+  - **원인:** `ackermann_controllers.yaml`의 바퀴 배열 순서 오류. `ackermann_steering_controller`는 내부적으로 배열의 첫 번째 인덱스(`[0]`)를 **우측(Right) 바퀴**, 두 번째 인덱스(`[1]`)를 **좌측(Left) 바퀴**로 인식합니다. 만약 흔히 생각하는 `[Left, Right]` 순서로 기재할 경우, 내륜/외륜의 조향 각도와 속도 제어가 좌우 반대로 들어가 아커만 기하학이 붕괴됩니다.
+  - **해결:** 
+    1. `ackermann_controllers.yaml`에서 `front_wheels_names`와 `rear_wheels_names` 모두 `[우측 관절, 좌측 관절]` 순서로 배치합니다.
+    2. `wheel.urdf.xacro`의 조향 관절 축이 표준 반시계방향(CCW) 회전인 `<axis xyz="0 0 1"/>`로 되어 있는지 확인합니다.

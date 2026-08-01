@@ -3,7 +3,8 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /PointCloud21
       Splitter Ratio: 0.5
     Tree Height: 218
   - Class: rviz_common/Selection
@@ -87,11 +88,19 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        front_left_steering_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         front_left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+        front_right_steering_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         front_right_wheel:
           Alpha: 1
           Show Axes: false
@@ -178,7 +187,7 @@ Visualization Manager:
       Name: PointCloud2
       Position Transformer: XYZ
       Selectable: true
-      Size (Pixels): 1.5
+      Size (Pixels): 2
       Size (m): 0.019999999552965164
       Style: Points
       Topic:
@@ -258,25 +267,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 23.695722579956055
+      Distance: 19.825580596923828
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 6.0329742431640625
-        Y: 4.566746234893799
-        Z: -1.4150588512420654
+        X: 0.9760019183158875
+        Y: 0.08463601768016815
+        Z: 0.763323187828064
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8102019429206848
+      Pitch: 0.5702021718025208
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.722221374511719
+      Yaw: 5.3772172927856445
     Saved: ~
 Window Geometry:
   Camera:
@@ -296,5 +305,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1165
-  X: 702
-  Y: 381
+  X: 455
+  Y: 380

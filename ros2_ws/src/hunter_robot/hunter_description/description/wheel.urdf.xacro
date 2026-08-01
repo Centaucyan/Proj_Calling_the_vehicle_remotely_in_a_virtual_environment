@@ -44,8 +44,8 @@
       <axis xyz="0 1 0" rpy="0 0 0" />
     </joint>
     <gazebo reference="${wheel_prefix}_wheel">
-      <mu1 value="1.0"/>
-      <mu2 value="0.5"/>
+      <mu1 value="10.0"/>   <!-- 0.5 -> 10.0 상향 -->
+      <mu2 value="10.0"/>   <!-- 0.5 -> 10.0 상향 -->
       <kp value="10000000.0" />
       <kd value="1.0" />
       <!-- <fdir1 value="1 0 0"/> -->
@@ -63,7 +63,7 @@
   </xacro:macro>
 
 
-    <!-- [새로 추가: 전륜 조향 바퀴 매크로 - Z축 조향 관절 + Y축 구동 관절] 🌟 -->
+    <!-- [새로 추가: 전륜 조향 바퀴 매크로 - Z축 조향 관절 + Y축 구동 관절] -->
   <xacro:macro name="hunter_steering_wheel" params="wheel_prefix x y z roll:=0.0 pitch:=0.0 yaw:=0.0 is_sim:=true">
     
     <!-- 조향 킹핀 링크 (Dummy Steering Link) -->
@@ -111,8 +111,8 @@
       <axis xyz="0 1 0"/>
     </joint>
     <gazebo reference="${wheel_prefix}_wheel">
-      <mu1 value="0.5"/>
-      <mu2 value="0.5"/>
+      <mu1 value="10.0"/>   <!-- 0.5 -> 10.0 상향 🌟 -->
+      <mu2 value="10.0"/>   <!-- 0.5 -> 10.0 상향 🌟 -->
       <kp value="10000000.0" />
       <kd value="1.0" />
       <!-- <fdir1 value="1 0 0"/> -->
