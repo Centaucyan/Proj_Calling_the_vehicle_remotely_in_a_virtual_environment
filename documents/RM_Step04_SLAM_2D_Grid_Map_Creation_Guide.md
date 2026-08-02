@@ -232,7 +232,14 @@ ros2 run nav2_map_server map_saver_cli -f src/hunter_robot/hunter_gazebo/maps/pa
 
 ### 4.1. 결과 검증
 1. **RViz2 시각화 검증:** `Map` 디스플레이를 추가하여 `/map` 토픽의 2D 점유 격자 지도가 기둥과 외벽을 정확한 직선/직각형태로 표현하는지 확인
-2. **맵 저장 파일 검증:** `parking_garage_map.pgm` 이미지 파일을 열어 외벽 및 4개의 기둥 장애물이 왜곡 없이 뚜렷하게 맵화되었는지 확인
+2. **맵 저장 파일 검증:** 저장된 `parking_garage_map.pgm` 이미지 파일을 열어 외벽 및 4개의 기둥 장애물이 왜곡 없이 뚜렷하게 맵화되었는지 확인
+   > 💡 **[Tip] PGM 맵 파일 여는 방법 (우분투 환경)**
+   > PGM 파일은 단순한 흑백 이미지 포맷이지만 일반적인 더블클릭으로는 텍스트로 깨져서 열릴 수 있습니다. 이때 터미널에서 우분투 기본 이미지 뷰어인 `eog` 명령어를 사용하면 즉시 확인할 수 있습니다.
+   > ```bash
+   > cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws/src/hunter_robot/hunter_gazebo/maps
+   >
+   > eog parking_garage_map.pgm
+   > ```
 
 ### 4.2. 트러블슈팅 가이드
 * **문제 1: `slam_toolbox` 구동 시 `Failed to create solver_plugins::CspaSolver` 에러 발생**
