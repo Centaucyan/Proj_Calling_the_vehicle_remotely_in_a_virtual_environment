@@ -31,6 +31,15 @@
 ### 3.1. [Step 2.1] 센서 및 아커만 제어기 의존성 패키지 설치
 터미널을 열고 3D-LiDAR, 카메라 및 아커만 조향 제어기 패키지를 설치합니다.
 
+#### 📦 설치 대상 패키지 역할 및 설명
+1. **`ros-humble-gazebo-plugins`**: Gazebo 가상 환경 내에서 센서(카메라, LiDAR, IMU 등)를 렌더링하고 시뮬레이션 데이터를 ROS 2 토픽으로 노출시켜 주는 공식 플러그인 모음입니다.
+2. **`ros-humble-velodyne-description`**: 3D PointCloud 센서인 Velodyne LiDAR(VLP-16 등)의 3D 메쉬 파일 및 URDF 센서 링크 정의를 제공하는 패키지입니다.
+3. **`ros-humble-image-transport-plugins`**: 카메라 영상 데이터(Raw Image)를 압축(JPEG/PNG, Compressed Depth 등)하여 네트워크 대역폭을 절약하고 전송할 수 있는 플러그인 모음입니다.
+4. **`ros-humble-rviz2`**: ROS 2 환경에서 3D 센서 포인트클라우드, 로봇 3D 모델, TF 좌표계 및 2D/3D 지도를 실시간으로 관찰할 수 있는 표준 시각화 도구입니다.
+5. **`ros-humble-ackermann-steering-controller`**: 전륜 조향 및 후륜 구동 구조인 AgileX Hunter 차량 전용 **아커만 조향 제어기 플러그인**입니다.
+6. **`ros-humble-ackermann-msgs`**: 아커만 조향 제어에 필요한 속도 및 조향각 데이터 규격(`ackermann_msgs/msg/AckermannDrive`)을 정의하는 전용 메시지 패키지입니다.
+7. **`ros-humble-steering-controllers-library`**: 조향 기반 차량 제어기(Ackermann, Tricycle 등)의 공통 역동학 계산 및 궤적 수송을 다루는 하위 C++ 라이브러리입니다.
+
 ```bash
 sudo apt update
 sudo apt install -y \

@@ -64,7 +64,14 @@ ROS 2의 **Nav2**는 자율주행 로봇이 위치를 스스로 추정하고, �
 
 ### 3.1. [Step 5.1] Nav2 의존성 패키지 설치
 
-터미널에서 ROS 2 Humble 버전의 Navigation2 및 Bringup 패키지를 설치합니다.
+터미널에서 ROS 2 Humble 버전의 Navigation2 자율주행 스택 및 Bringup 패키지를 설치합니다.
+
+#### 📦 설치 대상 패키지 역할 및 설명
+1. **`ros-humble-navigation2`**:
+   - ROS 2 기반 자율주행을 위한 핵심 프레임워크 패키지입니다.
+   - 전역 경로 계획(Planner Server), 지역 경로 제어(Controller Server), 실시간 2D/3D 비용 지도(Costmap), 위치 추정(AMCL), 행동 트리 관리자(BT Navigator) 등 자율주행 알고리즘 구현에 필요한 모든 기본 노드와 플러그인 라이브러리를 제공합니다.
+2. **`ros-humble-nav2-bringup`**:
+   - Nav2 프레임워크의 복잡한 여러 노드(Map Server, AMCL, Planner, Controller, Lifecycle Manager 등)를 묶어서 한 번에 구동하고 관리하기 위한 공식 **Bringup 런치 스크립트, 기본 파라미터 YAML 템플릿 및 설정 헬퍼 패키지**입니다.
 
 ```bash
 sudo apt update

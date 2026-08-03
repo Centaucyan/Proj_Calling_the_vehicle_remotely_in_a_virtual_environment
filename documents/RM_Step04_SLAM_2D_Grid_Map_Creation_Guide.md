@@ -33,6 +33,11 @@
 
 SLAM, 맵 저장 도구 및 3D PointCloud -> 2D LaserScan 변환 패키지가 설치되어 있지 않은 경우 설치합니다.
 
+#### 📦 설치 대상 패키지 역할 및 설명
+1. **`ros-humble-slam-toolbox`**: 2D 점유 격자 지도(Occupancy Grid Map)를 실시간으로 구축(Online Async SLAM)하고 그래프 최적화(Ceres Solver) 및 루프 클로저(Loop Closure)를 수행하는 2D SLAM 알고리즘 패키지입니다.
+2. **`ros-humble-nav2-map-server`**: 완성된 SLAM 지도 데이터를 정적 맵 파일(`parking_garage_map.yaml`, `.pgm`)로 저장할 수 있는 CLI 도구(`map_saver_cli`) 및 주행 시 지도를 불러와 퍼블리시하는 노드를 제공합니다.
+3. **`ros-humble-pointcloud-to-laserscan`**: 3D LiDAR에서 입수되는 3D 포인트 클라우드 데이터(`/points_raw`)를 원하는 높이 슬라이스로 잘라 2D SLAM 노드가 수신 가능한 2D 레이저 스캔(`/scan`) 토픽으로 실시간 가공/변환하는 노드입니다.
+
 ```bash
 sudo apt update
 sudo apt install -y ros-humble-slam-toolbox ros-humble-nav2-map-server ros-humble-pointcloud-to-laserscan
