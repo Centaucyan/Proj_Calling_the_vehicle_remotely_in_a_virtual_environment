@@ -61,6 +61,7 @@ git submodule update --init --recursive
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y \
+  libasio-dev \
   ros-humble-gazebo-ros-pkgs \
   ros-humble-ros2-control \
   ros-humble-ros2-controllers \
@@ -87,6 +88,7 @@ sudo apt install -y \
 
 | 분류 | 패키지명 | 역할 및 상세 설명 |
 | :--- | :--- | :--- |
+| **C++ SDK & 통신** | `libasio-dev` | C++ 비동기 네트워크/시리얼/CAN 통신 범용 개발 라이브러리 (AgileX `ugv_sdk` 통신 모듈 컴파일 시 사용) |
 | **시뮬레이션 & 기본 제어** | `ros-humble-gazebo-ros-pkgs` | Gazebo 물리 시뮬레이터와 ROS 2 간의 클록, 모델 스폰, 관절 상태 통신 전용 인터페이스 패키지 모음 |
 | | `ros-humble-ros2-control` | 로봇 하드웨어와 제어 알고리즘(Controller) 간의 입출력을 총괄 관리하는 ROS 2 표준 제어 프레임워크 |
 | | `ros-humble-ros2-controllers` | 관절 상태 브로드캐스터, 위치/속도 제어기 등 표준 로봇 제어기 구현체 라이브러리 모음 |

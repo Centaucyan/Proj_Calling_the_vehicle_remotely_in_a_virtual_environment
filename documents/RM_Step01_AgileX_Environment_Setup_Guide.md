@@ -26,21 +26,23 @@
 ## 3. 단계별 상세 실행 절차
 
 ### 3.1. [Step 1.1] 시스템 필수 패키지 및 ROS2 컨트롤러 의존성 설치
-터미널을 열고 Gazebo 연동 및 로봇 제어에 필요한 핵심 ROS2 패키지를 설치합니다.
+터미널을 열고 Gazebo 연동 및 로봇 제어, AgileX C++ SDK 통신에 필요한 핵심 패키지를 설치합니다.
 
 #### 📦 설치 대상 패키지 역할 및 설명
-1. **`ros-humble-gazebo-ros-pkgs`**: Gazebo 물리 시뮬레이터와 ROS 2 간의 클록, 모델 스폰, 관절 상태 통신을 담당하는 기본 연동 인터페이스 패키지 모음입니다.
-2. **`ros-humble-ros2-control`**: 로봇의 하드웨어와 제어 알고리즘(Controller) 간의 입출력을 총괄 관리하는 ROS 2 표준 제어 프레임워크입니다.
-3. **`ros-humble-ros2-controllers`**: 관절 상태, 위치/속도 제어 등 기본 제어기(Joint State Broadcaster, Diff Drive Controller 등)의 구현체 라이브러리입니다.
-4. **`ros-humble-gazebo-ros2-control`**: Gazebo 가상 로봇에 `ros2_control` 제어기를 결합하여 시뮬레이션 상에서 모터를 구동할 수 있게 돕는 전용 플러그인입니다.
-5. **`ros-humble-teleop-twist-keyboard`**: 키보드 입력을 기반으로 로봇의 이동 속도 명령(`/cmd_vel`)을 퍼블리시하는 노드입니다.
-6. **`ros-humble-joint-state-publisher`**: 로봇 URDF에 정의된 각 관절(Wheel, Steering 등)의 회전/이동 상태를 수집하고 `/joint_states` 토픽으로 트래킹하는 노드입니다.
-7. **`ros-humble-joint-state-publisher-gui`**: GUI 인터페이스의 슬라이더를 이용하여 로봇의 각 관절 각도를 수동으로 조작해 볼 수 있는 테스트 도구입니다.
-8. **`ros-humble-xacro`**: 복잡한 로봇 3D/URDF 구조를 매크로, 변수, 파일 분할을 통해 효율적으로 해석하고 XML로 파싱해 주는 파서 툴입니다.
+1. **`libasio-dev`**: C++ 비동기 네트워크/시리얼/CAN 통신 범용 개발 라이브러리입니다. (AgileX `ugv_sdk` 통신 모듈 컴파일 시 사용)
+2. **`ros-humble-gazebo-ros-pkgs`**: Gazebo 물리 시뮬레이터와 ROS 2 간의 클록, 모델 스폰, 관절 상태 통신을 담당하는 기본 연동 인터페이스 패키지 모음입니다.
+3. **`ros-humble-ros2-control`**: 로봇의 하드웨어와 제어 알고리즘(Controller) 간의 입출력을 총괄 관리하는 ROS 2 표준 제어 프레임워크입니다.
+4. **`ros-humble-ros2-controllers`**: 관절 상태, 위치/속도 제어 등 기본 제어기(Joint State Broadcaster, Diff Drive Controller 등)의 구현체 라이브러리입니다.
+5. **`ros-humble-gazebo-ros2-control`**: Gazebo 가상 로봇에 `ros2_control` 제어기를 결합하여 시뮬레이션 상에서 모터를 구동할 수 있게 돕는 전용 플러그인입니다.
+6. **`ros-humble-teleop-twist-keyboard`**: 키보드 입력을 기반으로 로봇의 이동 속도 명령(`/cmd_vel`)을 퍼블리시하는 노드입니다.
+7. **`ros-humble-joint-state-publisher`**: 로봇 URDF에 정의된 각 관절(Wheel, Steering 등)의 회전/이동 상태를 수집하고 `/joint_states` 토픽으로 트래킹하는 노드입니다.
+8. **`ros-humble-joint-state-publisher-gui`**: GUI 인터페이스의 슬라이더를 이용하여 로봇의 각 관절 각도를 수동으로 조작해 볼 수 있는 테스트 도구입니다.
+9. **`ros-humble-xacro`**: 복잡한 로봇 3D/URDF 구조를 매크로, 변수, 파일 분할을 통해 효율적으로 해석하고 XML로 파싱해 주는 파서 툴입니다.
 
 ```bash
 sudo apt update
 sudo apt install -y \
+  libasio-dev \
   ros-humble-gazebo-ros-pkgs \
   ros-humble-ros2-control \
   ros-humble-ros2-controllers \
