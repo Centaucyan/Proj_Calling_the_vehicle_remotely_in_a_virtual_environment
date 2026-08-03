@@ -205,7 +205,7 @@ install(
 #### 1) [터미널 1] SLAM 통합 런치 실행
 ```bash
 cd ros2_ws
-colcon build --symlink-install
+colcon build
 source install/setup.bash
 ros2 launch hunter_gazebo slam_mapping.launch.py
 ```

@@ -441,7 +441,7 @@ gazebo_ros2_control:
 
 1. Gazebo 시뮬레이션 및 RViz2 구동:
    ```bash
-   colcon build --symlink-install
+   colcon build
    source install/setup.bash
    ros2 launch hunter_gazebo launch_sim.launch.py
    # (별도 터미널) 

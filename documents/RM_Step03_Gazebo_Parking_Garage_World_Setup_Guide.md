@@ -425,7 +425,7 @@ ament_package()
 
 ```bash
 cd ~/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
-colcon build --symlink-install
+colcon build
 source install/setup.bash
 
 # 1. 주차장 월드 환경으로 Gazebo 시뮬레이션 구동

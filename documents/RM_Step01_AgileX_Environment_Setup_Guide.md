@@ -86,7 +86,7 @@ rosdep update
 rosdep install --from-paths src --ignore-src -r -y --skip-keys "catkin"
 
 # 3. colcon 빌드 실행
-colcon build --symlink-install
+colcon build
 
 # 4. 환경 변수 반영
 source install/setup.bash
