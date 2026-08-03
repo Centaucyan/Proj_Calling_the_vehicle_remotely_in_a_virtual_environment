@@ -99,7 +99,7 @@ sudo apt install -y \
 | | `ros-humble-velodyne-description` | Velodyne 3D-LiDAR 센서(VLP-16 등)의 3D 메쉬 파일 및 URDF 링크 정의 패키지 |
 | | `ros-humble-image-transport-plugins` | 카메라 영상 데이터(Raw Image)를 압축 전송하여 네트워크 대역폭을 절약하는 플러그인 모음 |
 | | `ros-humble-rviz2` | 3D 센서 포인트클라우드, 로봇 3D 모델, TF 좌표계 및 2D/3D 지도를 실시간 관찰하는 시각화 도구 |
-| | `ros-humble-ackermann-steering-controller` | 아커만 조향 구조(전륜 조향-후륜 구동) 차량용 ROS 2 범용 **아커만 조향 제어기 플러그인** |
+| | `ros-humble-ackermann-steering-controller` | 아커만 조향 구조(전륜 조향-후륜 구동) 차량용 ROS 2 범용 아커만 조향 제어기 플러그인 |
 | | `ros-humble-ackermann-msgs` | 아커만 조향 제어 데이터 규격(`ackermann_msgs/msg/AckermannDrive`)을 정의하는 전용 메시지 패키지 |
 | | `ros-humble-steering-controllers-library` | 조향 기반 차량 제어기의 공통 역동학 계산 및 궤적 수송을 다루는 하위 C++ 라이브러리 |
 | **2D SLAM 매핑** | `ros-humble-slam-toolbox` | 2D 점유 격자 지도 구축, 그래프 최적화(Ceres Solver) 및 루프 클로저를 수행하는 SLAM 패키지 |
