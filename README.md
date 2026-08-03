@@ -1,13 +1,19 @@
 # Proj_Calling_the_vehicle_remotely_in_a_simulation_env
 
-* Update: 2026.08.02.(프로젝트 4/10 단계 완료)
+* Update: 2026.08.03.(프로젝트 5/10 단계 진행 중)
+* Project duration: 2026.07.15 ~
 ## 1. Description
 * 시뮬레이션 환경에서 리모컨(Qt Dashborad)으로 차량을 호출하면, 차량은 리모컨의 위치로 자율 주행 이동.(프로젝트 과정은 '/documents/RM_Step01-10_*.md'에 정리하며 진행)
 * **Github Repository:** https://github.com/Centaucyan/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment.git
 * **Vehicle model:** AgileX Hunter
 * **Tool:**
-  * slam-toolbox
-  * nav2-map-server
+  * 지도 작성
+    * slam-toolbox
+    * nav2-map-server
+  * Navigation
+    * navigation2
+    * nav2-bringup
+    
 
 ![Gazebo](./documents/images/hunter_in_gazebo.png)
 ![Rviz2](./documents/images/hunter_in_rviz2.png)
@@ -68,7 +74,9 @@ git submodule update --init --recursive
   ros-humble-pointcloud-to-laserscan \
   ros-humble-ackermann-steering-controller \
   ros-humble-ackermann-msgs \
-  ros-humble-steering-controllers-library
+  ros-humble-steering-controllers-library \
+  ros-humble-navigation2 /
+  ros-humble-nav2-bringup
 ---
 
 ## 5. Execute Commands
