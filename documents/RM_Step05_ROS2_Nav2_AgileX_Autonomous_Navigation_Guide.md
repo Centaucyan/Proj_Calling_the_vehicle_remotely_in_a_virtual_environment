@@ -401,7 +401,7 @@ def generate_launch_description():
 
 ```bash
 cd ros2_ws
-colcon build --symlink-install
+colcon build
 source install/setup.bash
 ```
 
