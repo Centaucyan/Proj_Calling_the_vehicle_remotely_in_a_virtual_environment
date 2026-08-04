@@ -1,7 +1,7 @@
 # Issue 03: RVIz2(Nav2) 실행 시 아커만 차량이 제자리 회전(Spin)을 하는 현상
 
 ## 🚨 문제 현상 (Issue Description)
-- 로봇의 모든 구동계 및 컨트롤러 설정을 아커만 조향(Ackermann Steering) 구조로 완벽히 변경했음에도 불구하고, 자율주행(Nav2) 중 특정 구간(코너 등)에서 로봇이 제자리 회전을 시도함.
+- 로봇의 모든 구동계 및 컨트롤러 설정을 아커만 조향(Ackermann Steering) 구조로 완벽히 변경했음에도 불구하고, 자율주행(Nav2) 중 로봇이 제자리 회전을 시도함.
 - 아커만 구조 특성상 제자리 회전(Zero-radius Turn)이 불가능하므로, 앞바퀴만 최대 각도로 꺾인 채 주행을 하지 못하고 오도가도 못하는 현상(Controller Failure)이 발생함.
 
 ## 🕵️ 원인 분석 (Root Cause)
@@ -25,3 +25,57 @@
 
 ### 2. 복구 행동(Recovery Behaviors)에서 `Spin` 비활성화
 - 아커만 로봇은 제자리 회전이 불가능하므로, 문제가 생겼을 때 제자리 회전(`Spin`) 대신 **후진(`Backup`)**이나 잠시 대기(`Wait`)만 수행하도록 Nav2 설정(`nav2_params.yaml`) 및 행동 트리에서 제자리 회전 복구 명령을 제거.
+
+---
+
+## 💻 실제 적용 코드 (Applied Code)
+위 해결 방법을 적용하기 위해 아래와 같이 설정 파일을 수정하였습니다.
+
+* **수정 파일:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/nav2_params.yaml`
+
+### 1. 전역 플래너 (SmacPlannerHybrid) 교체
+기존 `NavfnPlanner`를 주석 처리하고 아커만 곡선 모델인 `DUBIN`을 사용하는 Smac 플래너를 적용합니다.
+```yaml
+planner_server:
+  ros__parameters:
+    use_sim_time: True
+    planner_plugins: ["GridBased"]
+    GridBased:
+      # 기존 차동 구동 방식 플래너 주석 처리
+      # plugin: "nav2_navfn_planner/NavfnPlanner"
+      # tolerance: 0.5
+      
+      # 아커만 전용 플래너 적용
+      plugin: "nav2_smac_planner/SmacPlannerHybrid"
+      tolerance: 0.5
+      downsample_costmap: false
+      allow_unknown: true
+      max_iterations: 1000000
+      max_on_approach_iterations: 1000
+      max_planning_time: 5.0
+      motion_model_for_search: "DUBIN"  # 전진 주행 기반 아커만 곡선 모델
+      angle_quantization_bins: 72
+      analytic_expansion_ratio: 3.5
+      analytic_expansion_max_length: 3.0
+      minimum_turning_radius: 0.6       # Hunter 로봇 물리적 최소 회전 반경
+      # ... (기타 페널티 파라미터) ...
+```
+
+### 2. Spin 복구 행동 제거
+불가능한 명령이 실행되지 않도록 `behavior_plugins` 목록에서 `spin`을 완전히 삭제합니다.
+```yaml
+behavior_server:
+  ros__parameters:
+    # ... (생략) ...
+    cycle_frequency: 10.0
+    
+    # 아커만 조향에서 불가능한 spin 플러그인 제거
+    # behavior_plugins: ["spin", "backup", "drive_on_heading", "wait"]
+    # spin:
+    #   plugin: "nav2_behaviors/Spin"
+    
+    behavior_plugins: ["backup", "drive_on_heading", "wait"]
+    backup:
+      plugin: "nav2_behaviors/BackUp"
+    # ... (생략) ...
+```
