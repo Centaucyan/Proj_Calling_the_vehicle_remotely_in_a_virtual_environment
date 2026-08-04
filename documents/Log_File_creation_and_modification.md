@@ -28,7 +28,7 @@
 
 6. **nav2_params.yaml**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/nav2_params.yaml`
-   * **설명:** Nav2 핵심 파라미터(AMCL, Costmap, Planner 등) 및 아커만 조향 전용 `RegulatedPurePursuitController` 제어기 설정 파일. **에러 방지를 위해 `lifecycle_manager` 리스트 및 `behavior_server` 전용 복구 행동 파라미터 추가 완료.** (Step 05)
+   * **설명:** Nav2 핵심 파라미터 및 아커만 조향 전용 제어기(`RegulatedPurePursuitController`) 설정 파일. **최신 아커만 주행 최적화를 위해 전역 플래너를 `SmacPlannerHybrid`로 전면 교체하였으며, 제자리 회전 에러(Spin)를 방지하기 위해 관련 복구 행동 파라미터를 업데이트 완료함.** (Step 05, Issue 03)
 
 7. **navigation.launch.py**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/navigation.launch.py`

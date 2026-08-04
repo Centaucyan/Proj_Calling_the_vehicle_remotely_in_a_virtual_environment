@@ -164,10 +164,31 @@ planner_server:
     use_sim_time: True
     planner_plugins: ["GridBased"]
     GridBased:
-      plugin: "nav2_navfn_planner/NavfnPlanner"
+      # 기존 차동 구동 방식 플래너 주석 처리
+      # plugin: "nav2_navfn_planner/NavfnPlanner"
+      # tolerance: 0.5
+      # use_astar: false
+      # allow_unknown: true
+
+      plugin: "nav2_smac_planner/SmacPlannerHybrid"  # 🌟 아커만 전용 플래너로 교체
       tolerance: 0.5
-      use_astar: false
+      downsample_costmap: false
       allow_unknown: true
+      max_iterations: 1000000
+      max_on_approach_iterations: 1000
+      max_planning_time: 5.0
+      motion_model_for_search: "DUBIN" # 🌟 전진 주행 기반 아커만 곡선 모델
+      angle_quantization_bins: 72
+      analytic_expansion_ratio: 3.5
+      analytic_expansion_max_length: 3.0
+      minimum_turning_radius: 0.6  # 🌟 Hunter 로봇의 물리적 최소 회전 반경(m) 설정
+      reverse_penalty: 2.1
+      change_penalty: 0.05
+      non_straight_penalty: 1.2
+      cost_penalty: 2.0
+      retrospective_penalty: 0.015
+      lookup_table_size: 20.0
+      cache_obstacle_heuristic: true
 
 local_costmap:
   local_costmap:
@@ -245,9 +266,13 @@ behavior_server:
     costmap_topic: local_costmap/costmap_raw
     footprint_topic: local_costmap/published_footprint
     cycle_frequency: 10.0
+    
+    # 🌟 행동 트리(BT) 에러 방지를 위해 임시로 Spin을 남겨두고 주석 처리로 이력 보존
     behavior_plugins: ["spin", "backup", "drive_on_heading", "wait"]
     spin:
       plugin: "nav2_behaviors/Spin"
+    # behavior_plugins: ["backup", "drive_on_heading", "wait"]
+    
     backup:
       plugin: "nav2_behaviors/BackUp"
     drive_on_heading:
@@ -452,17 +477,31 @@ source install/setup.bash
 rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
 ```
 
-#### 3) RViz2 상에서 주행 명령 수행 절차 (🌟 필수 실행 과정)
-1. **RViz2 디스플레이 추가:** `Map` (Global/Local Costmap), `Path` (Global/Local Plan), `Particle Cloud` (AMCL) 디스플레이 항목을 활성화합니다.
+#### 3) RViz2 시각화 요소(Display) 추가 및 주행 명령 수행 (🌟 필수 실행 과정)
+1. **경로 및 목적지 디스플레이 추가:**
+   - RViz2 좌측 하단의 **`Add`** 버튼 클릭 ➡️ 상단의 **`By topic`** 탭 선택
+   - **`/plan`** ➡️ `Path` 선택 후 `OK` (전체 주행 궤적 시각화, 빨간선/초록선)
+   - **`/local_plan`** ➡️ `Path` 선택 후 `OK` (순간 바퀴 주행 궤적 시각화, 파란선)
+   - **`/goal_pose`** ➡️ `Pose` 선택 후 `OK` (사용자가 지정한 최종 목적지 좌표 핀 표시)
 2. **초기 위치 지정 (2D Pose Estimate):**
-   - 상단 툴바의 **`2D Pose Estimate`** 버튼을 클릭합니다.
-   - Gazebo 월드 내 Hunter 로봇이 위치한 주차장 초기 지점을 클릭하고 차체 방향으로 마우스를 끌어 방향 튜닝을 완료합니다. (AMCL 파티클이 수렴함)
+   - 상단 툴바의 **`2D Pose Estimate`** 버튼을 클릭하여 로봇의 실제 위치와 방향을 잡아줍니다.
 3. **자율주행 목적지 지정 (2D Goal Pose):**
-   - 상단 툴바의 **`2D Goal Pose`** 버튼을 클릭합니다.
-   - 주차장 기둥 반대편 통로나 주차 공간 내부 지점을 클릭하고 마우스를 끌어 도착 시 방향을 지정합니다.
+   - 상단 툴바의 **`2D Goal Pose`** 버튼을 클릭하고 원하는 목적지에 클릭+드래그하여 도착 방향을 지정합니다.
 4. **자율주행 궤적 모니터링:**
-   - 로봇이 제자리 회전을 시도하지 않고 아커만 곡선을 그리며 이동하는지 확인합니다.
+   - 추가한 `/plan` 선을 따라 로봇이 제자리 회전 없이 아커만 곡선을 그리며 부드럽게 이동하는지 확인합니다.
    - 이동 중 전방 장애물(기둥/벽)을 감지하고 전역/지역 경로가 유연하게 장애물을 회피하여 최종 목적지 허용 오차 내에 도착하는지 검증합니다.
+
+#### 4) [터미널 3] 자율주행 상태 및 결과 실시간 모니터링 (선택 사항)
+RViz2에서 목적지를 찍은 후, 로봇이 현재 주행 중인지 도착했는지 명확한 시스템 상태를 확인하려면 새 터미널을 열고 아래 명령어를 실행합니다. (추후 Python 기반 원격 호출 프로그램 개발 시 상태 리턴값으로 활용됩니다.)
+
+```bash
+ros2 topic echo /navigate_to_pose/_action/status
+```
+* **출력 상태 코드(Status)의 의미:**
+  - `status: 2`: 목표를 향해 열심히 자율주행 진행 중 (Executing)
+  - `status: 4`: 목적지(XY 및 회전 오차 범위 내) 무사 도착 완료 (Succeeded)
+  - `status: 5`: 사용자나 시스템에 의해 주행 취소됨 (Canceled)
+  - `status: 6`: 코너에 갇히거나 경로를 찾을 수 없어 주행 포기 (Aborted/Failed)
 
 ---
 
