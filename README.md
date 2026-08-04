@@ -15,9 +15,10 @@
     * navigation2
     * nav2-bringup
     
-<video autoplay muted loop controls width="100%">
+<!-- <video autoplay muted loop controls width="100%">
   <source src="./documents/videos/autonomous_navigation_01.webm" type="video/webm">
-</video>
+</video> -->
+![Autonomous Navigation](./documents/videos/autonomous_navigation_01.gif)
 <!-- ![GNav](./documents/images/hunter_in_gazebo.png)
 ![Rviz2](./documents/images/hunter_in_rviz2.png)
 ![Slam](./documents/images/slam_in_rviz2.png)
