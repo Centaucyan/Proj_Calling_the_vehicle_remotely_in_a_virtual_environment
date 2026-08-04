@@ -233,7 +233,7 @@ ackermann_steering_controller:
     enable_odom_tf: true             # 👈 odom -> base_link TF 필수 발행
 
     publish_rate: 50.0
-    open_loop: true                  # 🌟 물리엔진 바퀴 슬립 무시, cmd_vel로 오도메트리 계산
+    open_loop: false
     use_stamped_vel: false
     cmd_vel_timeout: 1.0             # 키보드 신호 끊김 방지 타임아웃
 

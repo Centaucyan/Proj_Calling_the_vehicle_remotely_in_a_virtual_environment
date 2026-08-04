@@ -47,11 +47,13 @@ sudo apt install -y ros-humble-slam-toolbox ros-humble-nav2-map-server ros-humbl
 
 ### 3.2. [Step 4.2] 컨트롤러 점검 및 `slam_toolbox` 파라미터 파일 작성
 
-#### 1) 아커만 로봇 컨트롤러 오도메트리 TF 확인 (사전점검 필수 🌟)
-Step 02에서 구축한 아커만 전용 제어기(`ackermann_controllers.yaml`)를 통해 오도메트리 TF가 정상 발행되어야 `slam_toolbox`가 왜곡 없는 정적 지도를 생성합니다.
+#### 1) 아커만 로봇 컨트롤러 오도메트리 파라미터 임시 변경 (매핑용 🌟)
+Step 02에서 구축한 아커만 전용 제어기(`ackermann_controllers.yaml`)의 기본 설정은 실제 엔코더 값을 반영하는 `open_loop: false`입니다. 
+하지만 아커만 차량 특성상 가제보 내에서 회전 시 바퀴가 끌리는 슬립(Scrubbing) 현상이 발생하면, 오도메트리 노이즈로 인해 SLAM 지도의 벽면이 겹치거나 맵이 붕괴될 수 있습니다. 
+따라서 **성공적이고 깔끔한 2D 지도 작성을 위해, 매핑 과정에서만 임시로 `open_loop: true`로 변경**하여 오도메트리가 명령어(`cmd_vel`)대로 부드럽게 생성되도록 속입니다. (매핑 완료 후 반드시 다시 원복해야 합니다.)
 
-* **파일 위치:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/ackermann_controllers.yaml`
-* **확인 사항:** `enable_odom_tf` 항목이 `true`로 설정되어 있는지 확인합니다.
+* **수정 대상 파일:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/ackermann_controllers.yaml`
+* **변경 사항:** `open_loop` 항목을 `true`로 변경하고, `enable_odom_tf`가 `true`인지 확인합니다.
 
 ```yaml
 ackermann_steering_controller:
@@ -59,7 +61,8 @@ ackermann_steering_controller:
     ...
     odom_frame_id: odom
     base_frame_id: base_link
-    enable_odom_tf: true  # 👈 odom -> base_link TF 브로드캐스팅
+    enable_odom_tf: true  # 👈 odom -> base_link TF 브로드캐스팅 확인
+    open_loop: true       # 🌟 매핑을 위해 일시적으로 true로 변경 (부드러운 오도메트리 생성)
 ```
 
 #### 2) `slam_toolbox` 파라미터 파일 작성 (`mapper_params_online_async.yaml`)
@@ -229,6 +232,22 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 source install/setup.bash
 mkdir -p src/hunter_robot/hunter_gazebo/maps
 ros2 run nav2_map_server map_saver_cli -f src/hunter_robot/hunter_gazebo/maps/parking_garage_map
+```
+
+---
+
+### 3.6. [Step 4.6] 맵 작성 완료 후 오도메트리 파라미터 원복 (자율주행 준비) 🌟
+
+성공적으로 지도를 파일로 저장했다면, 다음 단계인 **[Step 5] 자율주행(Nav2)**을 위해 변경했던 파라미터를 반드시 원래 상태로 되돌려야 합니다.
+자율주행 시에는 로봇이 장애물에 부딪히거나 바퀴가 미끄러졌을 때 그 물리적 상태를 위치 추정 알고리즘(AMCL)이 알아차려야 합니다. 따라서 가상 궤적(`true`)이 아닌 실제 바퀴 회전량 기반(`false`)을 사용해야 로봇 이동 시 지도가 틀어지거나 돌아가는(Drift) 현상을 막을 수 있습니다.
+
+* **수정 대상 파일:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/ackermann_controllers.yaml`
+* **복구 내용:**
+```yaml
+ackermann_steering_controller:
+  ros__parameters:
+    # ... (생략) ...
+    open_loop: false  # 🌟 다시 false로 원복하여 자율주행(Nav2) 준비 완료
 ```
 
 ---
