@@ -26,9 +26,21 @@
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/ackermann_controllers.yaml`
    * **설명:** Hunter 2.0 물리 제원(축거 0.512m, 윤거 0.4908m, 바퀴 0.09906m)을 정밀 반영한 아커만 제어기 설정 파일. **물리적 바퀴 슬립에 의한 오도메트리 왜곡을 막기 위한 `open_loop: true` 설정 및 조향축 고정용 강력한 PID 게인(`p: 100.0, i: 0.0, d: 1.0`) 적용 완료.** (Step 02/Step 04)
 
+6. **nav2_params.yaml**
+   * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/nav2_params.yaml`
+   * **설명:** Nav2 핵심 파라미터(AMCL, Costmap, Planner 등) 및 아커만 조향 전용 `RegulatedPurePursuitController` 제어기 설정 파일. **에러 방지를 위해 `lifecycle_manager` 리스트 및 `behavior_server` 전용 복구 행동 파라미터 추가 완료.** (Step 05)
+
+7. **navigation.launch.py**
+   * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/navigation.launch.py`
+   * **설명:** Nav2 주요 노드(`map_server`, `amcl`, `behavior_server` 등) 구동 런치 스크립트. **Gazebo 전역 변수명과의 덮어쓰기 충돌 에러를 해결하기 위해 파라미터 변수명을 `nav_params_file`로 교체 적용 완료.** (Step 05)
+
+8. **bringup_sim_nav2.launch.py**
+   * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/launch/bringup_sim_nav2.launch.py`
+   * **설명:** Gazebo 주차장 월드(로봇 스폰 포함), 3D LiDAR 포인트 클라우드 변환(`pointcloud_to_laserscan`), 그리고 Nav2 통합 런치 파일을 모두 한 번에 묶어서 실행하는 최종 구동 파일 (Step 05)
+
 ---
 
-### 2. ✏️ 클론 후 수정한 파일 (Modified Files)
+### 2. ✏️ 클론 후 수정한 기존 파일 (Modified Files)
 
 1. **hunter.urdf.xacro**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_description/description/hunter.urdf.xacro`
@@ -60,7 +72,7 @@
 
 8. **CMakeLists.txt**
    * **경로:** `ros2_ws/src/hunter_robot/hunter_gazebo/CMakeLists.txt`
-   * **수정 내용:** 빌드 시 `worlds` 및 `maps` 디렉토리가 포함되어 설치되도록 타겟 수정 (Step 03, Step 04)
+   * **수정 내용:** 빌드 시 `worlds` 및 `maps` 디렉토리가 포함되어 설치되도록 타겟 수정 (Step 03, Step 04, Step 05)
 
 ---
 

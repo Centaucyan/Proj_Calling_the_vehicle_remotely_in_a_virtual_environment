@@ -237,7 +237,26 @@ lifecycle_manager:
   ros__parameters:
     use_sim_time: True
     autostart: true
-    node_names: ['map_server', 'amcl', 'planner_server', 'controller_server', 'bt_navigator']
+    node_names: ['map_server', 'amcl', 'planner_server', 'controller_server', 'behavior_server', 'bt_navigator']
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: True
+    costmap_topic: local_costmap/costmap_raw
+    footprint_topic: local_costmap/published_footprint
+    cycle_frequency: 10.0
+    behavior_plugins: ["spin", "backup", "drive_on_heading", "wait"]
+    spin:
+      plugin: "nav2_behaviors/Spin"
+    backup:
+      plugin: "nav2_behaviors/BackUp"
+    drive_on_heading:
+      plugin: "nav2_behaviors/DriveOnHeading"
+    wait:
+      plugin: "nav2_behaviors/Wait"
+    global_frame: odom
+    robot_base_frame: base_link
+    transform_tolerance: 0.1
 ```
 
 ---
@@ -259,7 +278,7 @@ def generate_launch_description():
     pkg_hunter_gazebo = get_package_share_directory('hunter_gazebo')
 
     map_yaml_file = LaunchConfiguration('map')
-    params_file = LaunchConfiguration('params_file')
+    nav_params_file = LaunchConfiguration('nav_params_file')
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
@@ -267,8 +286,8 @@ def generate_launch_description():
         default_value=os.path.join(pkg_hunter_gazebo, 'maps', 'parking_garage_map.yaml'),
         description='Full path to map yaml file to load')
 
-    declare_params_file_cmd = DeclareLaunchArgument(
-        'params_file',
+    declare_nav_params_file_cmd = DeclareLaunchArgument(
+        'nav_params_file',
         default_value=os.path.join(pkg_hunter_gazebo, 'config', 'nav2_params.yaml'),
         description='Full path to the ROS2 parameters file to use for all launched nodes')
 
@@ -283,35 +302,42 @@ def generate_launch_description():
         executable='map_server',
         name='map_server',
         output='screen',
-        parameters=[params_file, {'yaml_filename': map_yaml_file, 'use_sim_time': use_sim_time}])
+        parameters=[nav_params_file, {'yaml_filename': map_yaml_file, 'use_sim_time': use_sim_time}])
 
     start_amcl_node = Node(
         package='nav2_amcl',
         executable='amcl',
         name='amcl',
         output='screen',
-        parameters=[params_file, {'use_sim_time': use_sim_time}])
+        parameters=[nav_params_file, {'use_sim_time': use_sim_time}])
 
     start_planner_node = Node(
         package='nav2_planner',
         executable='planner_server',
         name='planner_server',
         output='screen',
-        parameters=[params_file, {'use_sim_time': use_sim_time}])
+        parameters=[nav_params_file, {'use_sim_time': use_sim_time}])
 
     start_controller_node = Node(
         package='nav2_controller',
         executable='controller_server',
         name='controller_server',
         output='screen',
-        parameters=[params_file, {'use_sim_time': use_sim_time}])
+        parameters=[nav_params_file, {'use_sim_time': use_sim_time}])
+    
+    start_behavior_server_node = Node(
+        package='nav2_behaviors',
+        executable='behavior_server',
+        name='behavior_server',
+        output='screen',
+        parameters=[nav_params_file, {'use_sim_time': use_sim_time}])
 
     start_bt_navigator_node = Node(
         package='nav2_bt_navigator',
         executable='bt_navigator',
         name='bt_navigator',
         output='screen',
-        parameters=[params_file, {'use_sim_time': use_sim_time}])
+        parameters=[nav_params_file, {'use_sim_time': use_sim_time}])
 
     start_lifecycle_manager = Node(
         package='nav2_lifecycle_manager',
@@ -320,16 +346,17 @@ def generate_launch_description():
         output='screen',
         parameters=[{'use_sim_time': use_sim_time},
                     {'autostart': True},
-                    {'node_names': ['map_server', 'amcl', 'planner_server', 'controller_server', 'bt_navigator']}])
+                    {'node_names': ['map_server', 'amcl', 'planner_server', 'controller_server', 'behavior_server', 'bt_navigator']}])
 
     return LaunchDescription([
         declare_map_yaml_cmd,
-        declare_params_file_cmd,
+        declare_nav_params_file_cmd,
         declare_use_sim_time_cmd,
         start_map_server_node,
         start_amcl_node,
         start_planner_node,
         start_controller_node,
+        start_behavior_server_node,
         start_bt_navigator_node,
         start_lifecycle_manager
     ])
