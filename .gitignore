@@ -1,2 +1,4 @@
 #. Visual Studio cache
 .vs/
+.vscode/
+/temp/

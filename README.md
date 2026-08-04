@@ -1,11 +1,12 @@
 # Proj_Calling_the_vehicle_remotely_in_a_simulation_env
 
-* Update: 2026.08.03.(프로젝트 5/10 단계 진행 중)
+* Update: 2026.08.04.(프로젝트 5/10 단계 완료)
 * Project duration: 2026.07.15 ~
 ## 1. Description
-* 시뮬레이션 환경에서 리모컨(Qt Dashborad)으로 차량을 호출하면, 차량은 리모컨의 위치로 자율 주행 이동.(프로젝트 과정은 '/documents/RM_Step01-10_*.md'에 정리하며 진행)
+* 시뮬레이션 환경에서 리모컨(Qt Dashborad)으로 차량을 호출하면, 차량은 리모컨의 위치로 자율 주행 이동.(프로젝트 과정은 '/documents/development_process/RM_Step01-10_*.md'에 정리하며 진행)
+* **목적:** 테슬라 Smart Summon 기능을 가상 환경에서 구현해봄으로써 SLAM(지도 작성)과 NAV2(경로 계획, 장애물 회피)를 경험 및 이해
 * **Github Repository:** https://github.com/Centaucyan/Proj_Calling_the_vehicle_remotely_in_a_virtual_environment.git
-* **Vehicle model:** AgileX Hunter
+* **Vehicle model:** AgileX Hunter(기본 설정인 Differential Drive 방식을 Ackermann Steering 방식으로 변경 사용)
 * **Tool:**
   * 지도 작성
     * slam-toolbox
@@ -14,11 +15,13 @@
     * navigation2
     * nav2-bringup
     
-
-![Gazebo](./documents/images/hunter_in_gazebo.png)
+<video autoplay muted loop controls width="100%">
+  <source src="./documents/videos/autonomous_navigation_01.webm" type="video/webm">
+</video>
+<!-- ![GNav](./documents/images/hunter_in_gazebo.png)
 ![Rviz2](./documents/images/hunter_in_rviz2.png)
 ![Slam](./documents/images/slam_in_rviz2.png)
-![Slam](./documents/images/slam_complete.png)
+![Slam](./documents/images/slam_complete.png) -->
 ---
 
 ## 2. Environment
@@ -121,18 +124,18 @@ sudo rosdep init
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 
-# 3. ros packages build
+# 3. ROS Packages build
 colcon build
 
 # 4. Gazebo 시뮬레이션 스폰 (3D-LiDAR & 카메라 통합 로봇)
 source install/setup.bash
-ros2 launch hunter_gazebo launch_sim.launch.py
+ros2 launch hunter_gazebo bringup_sim_nav2.launch.py
 
-# 5. 새 터미널에서 RViz2 구동 및 센서 시각화 확인
+# 5. 새 터미널에서 RViz2 구동: 센서 시각화 및 2D Pose Estimate(차량 첫 위치 및 방향 설정), 2D Goal Pose(차량 최종 위치 및 방향 설정) 버튼으로 자율 주행 구현_(본 문서 '1. Description' 영상 참조)
 source install/setup.bash
 rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
 
-# 6. 새 터미널에서 키보드 노드 실행 및 차량 조작
+# 6. 새 터미널에서 키보드 노드 실행 및 차량 수동 조작
 source install/setup.bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
@@ -141,6 +144,11 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 * **Github Repository:** 
   * https://github.com/LCAS/hunter_robot.git
   * https://github.com/agilexrobotics/ugv_sdk.git
+* **Document Site:** 
+  * https://wiki.ros.org/slam_toolbox/
+  * https://index.ros.org/p/nav2_map_server/
+  * https://docs.nav2.org/index.html
+  * https://index.ros.org/p/nav2_bringup/
 ---
 
 ## 7. ROS2 노드 구성도 (아키텍처)

@@ -1,4 +1,4 @@
 #. ROS2 'colcon build' output
-log/
-build/
-install/
+/log/
+/build/
+/install/
