@@ -135,6 +135,7 @@ ros2 launch hunter_gazebo bringup_sim_nav2.launch.py
 # 5. 새 터미널에서 RViz2 구동: 센서 시각화 및 2D Pose Estimate(차량 첫 위치 및 방향 설정), 2D Goal Pose(차량 최종 위치 및 방향 설정) 버튼으로 자율 주행 구현_(본 문서 '1. Description' 영상 참조)
 source install/setup.bash
 rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
+  ** PC 성능에 따라 RViz2가 실행 된 후 2d_map이 loading 되는 시간이 길수도 있음.
 
   Option) 자율주행 상태 및 결과 실시간 모니터링
   ros2 topic echo /navigate_to_pose/_action/status
