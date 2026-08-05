@@ -502,7 +502,6 @@ ros2 topic echo /navigate_to_pose/_action/status
   - `status: 4`: 목적지(XY 및 회전 오차 범위 내) 무사 도착 완료 (Succeeded)
   - `status: 5`: 사용자나 시스템에 의해 주행 취소됨 (Canceled)
   - `status: 6`: 코너에 갇히거나 경로를 찾을 수 없어 주행 포기 (Aborted/Failed)
-
 ---
 
 ## 4. 검증 및 트러블슈팅 (Troubleshooting)

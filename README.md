@@ -136,6 +136,15 @@ ros2 launch hunter_gazebo bringup_sim_nav2.launch.py
 source install/setup.bash
 rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
 
+  Option) 자율주행 상태 및 결과 실시간 모니터링
+  ros2 topic echo /navigate_to_pose/_action/status
+
+  ** 출력 상태 코드(Status)의 의미 **
+    - `status: 2`: 목표를 향해 열심히 자율주행 진행 중 (Executing)
+    - `status: 4`: 목적지(XY 및 회전 오차 범위 내) 무사 도착 완료 (Succeeded)
+    - `status: 5`: 사용자나 시스템에 의해 주행 취소됨 (Canceled)
+    - `status: 6`: 코너에 갇히거나 경로를 찾을 수 없어 주행 포기 (Aborted/Failed)
+
 # 6. 새 터미널에서 키보드 노드 실행 및 차량 수동 조작
 source install/setup.bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
