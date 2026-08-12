@@ -160,6 +160,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
   * https://index.ros.org/p/nav2_map_server/
   * https://docs.nav2.org/index.html
   * https://index.ros.org/p/nav2_bringup/
+  * https://control.ros.org/humble/index.html/
 ---
 
 ## 7. ROS2 노드 구성도 (아키텍처)

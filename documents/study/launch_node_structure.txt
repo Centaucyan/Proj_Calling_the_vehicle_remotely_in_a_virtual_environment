@@ -1,5 +1,19 @@
 # Start
 bringup_sim_nav2.launch.py
-  * aunch_sim.launch.py
-  * navigation.launch.py
-  * pointcloud_to_laserscan_node
+  * launch_sim.launch.py [hunter_gazebo]
+    - rsp.launch.py [hunter_description]
+    - gazebo.launch.py [gazebo_ros]
+    - spawn_entity.py [gazebo_ros (-topic, robot_description, -entity, hunter_gazebo)]
+    - spawner [controller_manager (ackermann_steering_controller)]
+    - spawner [controller_manager (joint_state_broadcaster)]
+    
+  * navigation.launch.py [hunter_gazebo]
+    - map_server [nav2_map_server]
+    - amcl [nav2_map_server]
+    - planner_server [nav2_planner]
+    - controller_server [nav2_controller]
+    - behavior_server [nav2_behaviors]
+    - bt_navigator [nav2_bt_navigator]
+    - lifecycle_manager [nav2_lifecycle_manager]
+        
+  * pointcloud_to_laserscan_node [pointcloud_to_laserscan]
