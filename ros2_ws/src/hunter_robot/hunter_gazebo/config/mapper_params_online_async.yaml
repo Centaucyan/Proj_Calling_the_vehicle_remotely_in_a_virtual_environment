@@ -22,8 +22,6 @@ pointcloud_to_laserscan:
 # ==============================================================================
 slam_toolbox:
   ros__parameters:
-    use_sim_time: true
-
     # Solver settings
     # solver_plugin: solver_plugins::CspaSolver
     solver_plugin: solver_plugins::CeresSolver
@@ -58,6 +56,7 @@ slam_toolbox:
     link_scan_maximum_distance: 1.5
     loop_search_maximum_distance: 3.0
     do_loop_closing: true
+    use_sim_time: true
 
     # Map resolution settings
     resolution: 0.05
