@@ -1,5 +1,5 @@
 # Start
-bringup_sim_nav2.launch.py
+1. bringup_sim_nav2.launch.py
   * launch_sim.launch.py [hunter_gazebo]
     - rsp.launch.py [hunter_description]
     - gazebo.launch.py [gazebo_ros]
@@ -17,3 +17,6 @@ bringup_sim_nav2.launch.py
     - lifecycle_manager [nav2_lifecycle_manager]
         
   * pointcloud_to_laserscan_node [pointcloud_to_laserscan]
+
+
+2. view_hunter.rviz
