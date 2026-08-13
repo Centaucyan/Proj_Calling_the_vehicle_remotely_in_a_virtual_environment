@@ -15,33 +15,34 @@ def generate_launch_description():
         )
     )
 
-    # 2. 3D PointCloud (/points_raw) -> 2D LaserScan (/scan) 변환 노드
+    # 2. SLAM Toolbox, pointcloud_to_laserscan 설정 파일 지정
+    slam_config_file = os.path.join(pkg_hunter_gazebo, 'config', 'mapper_params_online_async.yaml')
+
+    # 3. 3D PointCloud (/points_raw) -> 2D LaserScan (/scan) 변환 노드
     start_pointcloud_to_laserscan_node = Node(
         package='pointcloud_to_laserscan',
         executable='pointcloud_to_laserscan_node',
         name='pointcloud_to_laserscan',
         output='screen',
-        parameters=[{
-            'target_frame': 'velodyne_link',
-            'transform_tolerance': 0.01,
-            'min_height': -0.1,  # 🌟 바닥(Z=0)이 스캔에 포함되어 장애물(검은색)로 인식되는 것을 막기 위해 상향 조정 (LiDAR Z=0.35)
-            'max_height': 1.0,
-            'angle_min': -3.14159,
-            'angle_max': 3.14159,
-            'angle_increment': 0.0087,
-            'scan_time': 0.1,
-            'range_min': 0.3,
-            'range_max': 20.0,
-            'use_sim_time': True
-        }],
+        # parameters=[{
+        #     'target_frame': 'velodyne_link',
+        #     'transform_tolerance': 0.01,
+        #     'min_height': -0.1,  # 🌟 바닥(Z=0)이 스캔에 포함되어 장애물(검은색)로 인식되는 것을 막기 위해 상향 조정 (LiDAR Z=0.35)
+        #     'max_height': 1.0,
+        #     'angle_min': -3.14159,
+        #     'angle_max': 3.14159,
+        #     'angle_increment': 0.0087,
+        #     'scan_time': 0.1,
+        #     'range_min': 0.3,
+        #     'range_max': 20.0,
+        #     'use_sim_time': True
+        # }],
+        parameters=[slam_config_file],
         remappings=[
             ('cloud_in', '/points_raw'),
             ('scan', '/scan')
         ]
     )
-
-    # 3. SLAM Toolbox 설정 파일 지정
-    slam_config_file = os.path.join(pkg_hunter_gazebo, 'config', 'mapper_params_online_async.yaml')
 
     # 4. slam_toolbox 노드 실행
     start_async_slam_toolbox_node = Node(
@@ -50,8 +51,8 @@ def generate_launch_description():
         name='slam_toolbox',
         output='screen',
         parameters=[
-            slam_config_file,
-            {'use_sim_time': True}
+            slam_config_file
+            # {'use_sim_time': True}
         ]
     )
 
