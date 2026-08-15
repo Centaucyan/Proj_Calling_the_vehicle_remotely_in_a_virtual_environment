@@ -2,6 +2,7 @@
 1. bringup_sim_nav2.launch.py
   * launch_sim.launch.py [hunter_gazebo]
     - rsp.launch.py [hunter_description]
+      : robot_state_publisher [robot_state_publisher]
     - gazebo.launch.py [gazebo_ros]
     - spawn_entity.py [gazebo_ros (-topic, robot_description, -entity, hunter_gazebo)]
     - spawner [controller_manager (ackermann_steering_controller)]
