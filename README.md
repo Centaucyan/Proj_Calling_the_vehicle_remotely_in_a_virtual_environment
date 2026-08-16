@@ -26,11 +26,14 @@
 ---
 
 ## 2. Environment
-* **OS:** Ubuntu 22.04 LTS(Jammy Jellyfish)
-* **Language:** C++, Python(Ver: 3.10)
-* **Middle ware:** ROS 2 Humble Hawksbill
-* **Simulator:** Gazebo
-* **Visualization Tool:** RViz2
+* **OS:** `Ubuntu 22.04 LTS(Jammy Jellyfish)`
+* **Language:** `C++, Python(Ver: 3.10)`
+* **Middle ware:** `ROS 2 Humble Hawksbill`
+* **Simulator:** `Gazebo`
+* **Visualization Tool:** `RViz2`
+* **경로 계획 알고리즘 (Global Planner):** `Hybrid-A*`
+  - **개요**: 기존 A* 알고리즘의 한계(격자 지도 기반의 각진 경로)를 보완하여, 차량이 주행 가능한 곡선 궤적을 반영해 탐색.
+  - **곡선 모션 모델 (`Reeds-Shepp`)**: 전진과 후진을 모두 고려한 곡선을 생성하여 좁은 공간이나 코너에서도 탈출 경로 계획 가능. *(참고: 전진 전용은 Dubins 모델)*
 ---
 
 ## 3. 저장소 클론 및 서브모듈(Submodule) 다운로드 가이드

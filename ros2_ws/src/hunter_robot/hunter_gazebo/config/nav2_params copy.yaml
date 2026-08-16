@@ -1,0 +1,280 @@
+amcl:
+  ros__parameters:
+    use_sim_time: True
+    alpha1: 0.2     # 👈 값 클수록 회전 오차 엄청 크다고 설정
+    alpha2: 0.2
+    alpha3: 0.2
+    alpha4: 0.2     # 👈 값 클수록 미끄러짐 오차 크다고 설정
+    alpha5: 0.2
+    base_frame_id: "base_link"
+    global_frame_id: "map"
+    odom_frame_id: "odom"
+    scan_topic: scan
+    max_particles: 2000
+    min_particles: 500
+    update_min_d: 0.1   
+    update_min_a: 0.1  
+
+bt_navigator:
+  ros__parameters:
+    use_sim_time: True
+    global_frame: map
+    robot_base_frame: base_link
+    odom_topic: odom
+    bt_loop_duration: 10
+    default_server_timeout: 20
+
+controller_server:
+  ros__parameters:
+    use_sim_time: True
+    controller_frequency: 20.0
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.5
+    min_theta_velocity_threshold: 0.001
+    failure_tolerance: 0.3
+    progress_checker_plugin: "progress_checker"
+    goal_checker_plugins: ["general_goal_checker"]
+    controller_plugins: ["FollowPath"]
+
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.5
+      movement_time_allowance: 10.0
+
+    general_goal_checker:
+      stateful: True
+      plugin: "nav2_controller::SimpleGoalChecker"
+      xy_goal_tolerance: 0.25
+      yaw_goal_tolerance: 0.25
+
+    # 🌟 MPPI (Model Predictive Path Integral) Controller 설정 (아커만 모드)
+    FollowPath:
+      plugin: "nav2_mppi_controller::MPPIController"
+      time_steps: 56                 # 미래 예측 시간 스텝 (56 * 0.05s = 약 2.8초 앞 예측)
+      model_dt: 0.05                 # 시뮬레이션 시간 간격 (dt)
+      batch_size: 1000               # 샘플링할 가상 주행 궤적 개수 (CPU 부하에 따라 800~2000 조절)
+      iteration_count: 2             # 최적화 반복 횟수
+      vx_std: 0.2                    # 속도 샘플링 표준편차
+      vy_std: 0.0                    # Y축(옆으로 이동) 편차 (아커만은 0으로 고정)
+      wz_std: 0.4                    # 각속도(조향) 샘플링 표준편차
+      vx_max: 2.5                    # 최대 전진 속도 (m/s)
+      vx_min: -1.5                   # 최대 후진 속도 (m/s) - 후진 허용
+      vy_max: 0.0                    # Y축 속도 (아커만은 0)
+      wz_max: 1.0                    # 최대 각속도 (rad/s)
+      prune_distance: 1.5            # 지난 경로 정리 거리
+      transform_tolerance: 0.2
+      motion_model: "Ackermann"      # 🌟 아커만 조향 모션 모델 지정! (DiffDrive / Ackermann / Omni 지원)
+      visualize: false               # RViz로 수천 개의 샘플 궤적 시각화 여부 (디버깅용, CPU 절약 위해 false 권장)
+      # 🌟 Critics: 수천 개의 궤적 중 '최선의 궤적'을 고르는 채점 기준들
+      critics: [
+        "ConstraintCritic", 
+        "ObstaclesCritic", 
+        "GoalCritic", 
+        "GoalAngleCritic", 
+        "PathAlignCritic", 
+        "PathFollowCritic", 
+        "PathAngleCritic", 
+        "PreferForwardCritic"
+      ]
+      ConstraintCritic:              # 최대 가속도/속도 제한 준수 여부 채점
+        enabled: true
+        cost_power: 1
+        cost_weight: 4.0
+      ObstaclesCritic:               # 장애물 충돌 위험 채점 (충돌 시 매우 큰 벌점)
+        enabled: true
+        cost_power: 1
+        repulsion_weight: 0.5
+        critical_weight: 20.0
+        consider_footprint: true      # 로봇 차체 외곽선(Footprint) 충돌 검사
+        collision_cost: 10000.0
+        collision_margin_distance: 0.05
+        near_goal_distance: 0.5
+      GoalCritic:                    # 최종 목적지에 얼마나 가까워지는가
+        enabled: true
+        cost_power: 1
+        cost_weight: 5.0
+        threshold_to_consider: 1.4
+      GoalAngleCritic:               # 목표 지점 도착 시 목표 방향과 얼마나 일치하는가
+        enabled: true
+        cost_power: 1
+        cost_weight: 3.0
+        threshold_to_consider: 0.5
+      PathAlignCritic:               # 전역 경로(Global Path)의 모양을 얼마나 잘 따르는가
+        enabled: true
+        cost_power: 1
+        cost_weight: 6.0
+        max_path_occupancy_ratio: 0.05
+        trajectory_point_step: 3
+        threshold_to_consider: 0.5
+        offset_from_furthest: 20
+        use_path_orientations: false
+      PathFollowCritic:              # 전역 경로를 앞쪽으로 얼마나 진도(Progress)를 나가는가
+        enabled: true
+        cost_power: 1
+        cost_weight: 10.0
+        offset_from_furthest: 5
+        threshold_to_consider: 1.4
+      PathAngleCritic:               # 경로의 곡선 각도와 로봇 헤딩 각도의 일치도
+        enabled: true
+        cost_power: 1
+        cost_weight: 2.0
+        offset_from_furthest: 4
+        mode: 0
+        threshold_to_consider: 0.5
+      PreferForwardCritic:           # 웬만하면 후진보다 전진 주행을 선호하도록 유도
+        enabled: true
+        cost_power: 1
+        cost_weight: 5.0
+        threshold_to_consider: 0.5
+
+    # 🌟 아커만 조향 전용 Regulated Pure Pursuit Controller 설정
+    # FollowPath:
+    #   plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+    #   desired_linear_vel: 1.4
+    #   # 👇 시선을 멀리 두어 핸들을 부드럽게 꺾도록 수정 (미끄러짐 방지)
+    #   lookahead_dist: 1.0           # 👈 (기존 0.8) 평상시 1.5m 앞을 보고 주행
+    #   min_lookahead_dist: 0.7       # 👈 (기존 0.4) 아무리 느려도 최소 1m 앞은 보장! (이게 작으면 핸들을 확 꺾어버림)
+    #   max_lookahead_dist: 2.0      # 👈 (기존 1.2) 최대 2.5m 앞까지 주시
+    #   lookahead_time: 1.5
+    #   rotate_to_heading_angular_vel: 0.0
+    #   transform_tolerance: 0.2
+    #   use_velocity_scaled_lookahead_dist: true
+    #   min_approach_linear_velocity: 0.05
+    #   approach_velocity_scaling_dist: 0.6
+    #   use_collision_detection: true
+    #   max_allowed_time_to_collision_up_to_fast_stop: 0.5  # 현재 속도를 기준으로 N초 뒤의 미래 위치를 예측해 충돌을 방지함. 속도가 빠를 때(예: 1.6m/s) 이 값이 크면 너무 먼 곳(1.6m 앞)의 장애물을 보고 지레 겁먹고 멈추므로 0.3~0.5 정도로 낮추는 것을 권장함.
+    #   use_regulated_linear_velocity_scaling: false  # 경로가 구부러진 정도(커브/곡률)가 심할 때 안전을 위해 자동으로 속도를 줄이는 기능. 미세하게 꺾인 경로에서 가다 서기를 반복하는 원인이 되므로 false 권장.
+    #   use_cost_regulated_linear_velocity_scaling: false # 로봇이 장애물 근처(Costmap의 위험 구역)에 진입했을 때 쫄아서 자동으로 속도를 줄이는 기능. 좁은 틈새를 지날 때 아예 멈춰버리는 원인이 되므로 false 권장.
+    #   cost_scaling_dist: 0.6
+    #   cost_scaling_factor: 10.0
+    #   regulated_linear_scaling_min_radius: 0.9
+    #   regulated_linear_scaling_min_speed: 0.1
+    #   use_rotate_to_heading: false  # 👈 필수: 아커만 제자리 회전 시도 방지
+    #   allow_reversing: true           # 👈 후진 궤적을 따라 뒤로 갈 수 있도록 허용!
+
+planner_server:
+  ros__parameters:
+    use_sim_time: True
+    planner_plugins: ["GridBased"]
+    GridBased:
+      # 기존 차동 구동 방식 플래너 주석 처리
+      # plugin: "nav2_navfn_planner/NavfnPlanner"
+      # tolerance: 0.5
+      # use_astar: false
+      # allow_unknown: true
+
+      plugin: "nav2_smac_planner/SmacPlannerHybrid"  # 🌟 아커만 전용 플래너로 교체
+      tolerance: 0.5
+      downsample_costmap: false
+      allow_unknown: true
+      max_iterations: 1000000
+      max_on_approach_iterations: 1000
+      max_planning_time: 5.0
+      # motion_model_for_search: "DUBIN" # 🌟 전진 주행 기반 아커만 곡선 모델
+      motion_model_for_search: "REEDS_SHEPP"  # 🌟 전후진 주행 기반 아커만 곡선 모델
+      angle_quantization_bins: 72
+      analytic_expansion_ratio: 3.5
+      analytic_expansion_max_length: 3.0
+      minimum_turning_radius: 1.6  # 🌟 Hunter 로봇의 물리적 최소 회전 반경(m) 설정
+      reverse_penalty: 1.5
+      change_penalty: 0.5
+      non_straight_penalty: 1.2
+      cost_penalty: 6.0  # 장애물 근처(위험 구역) 진입 시 부여하는 벌점. 값이 클수록 장애물을 멀찍이 피해서 방 한가운데로만 경로를 계획함.
+      retrospective_penalty: 0.015
+      lookup_table_size: 20.0
+      cache_obstacle_heuristic: true
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      update_frequency: 5.0
+      publish_frequency: 2.0
+      global_frame: odom
+      robot_base_frame: base_link
+      use_sim_time: True
+      rolling_window: true
+      width: 4
+      height: 4
+      resolution: 0.05
+      # robot_radius: 0.45
+      footprint: "[ [0.45, 0.32], [0.45, -0.32], [-0.45, -0.32], [-0.45, 0.32] ]"
+      plugins: ["obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: scan
+        scan:
+          topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 2.0  # 장애물에서 멀어질수록 위험도(Cost)가 얼마나 빨리 줄어들지 결정하는 팽창 계수. 값이 작을수록 위험도가 넓고 부드럽게 퍼져서 로봇이 먼 곳부터 스무스하게 피함. (값이 크면 벽에 바짝 다가가서야 급격하게 피함)
+        inflation_radius: 1.0 # 장애물 주변으로 뿜어져 나오는 가상의 '안전거리(위험 구역)' 최대 반경. 값이 클수록 로봇이 먼 곳부터 장애물을 경계함.
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      global_frame: map
+      robot_base_frame: base_link
+      use_sim_time: True
+      # robot_radius: 0.45
+      footprint: "[ [0.45, 0.32], [0.45, -0.32], [-0.45, -0.32], [-0.45, 0.32] ]"
+      resolution: 0.05
+      track_unknown_space: true
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_subscribe_transient_local: True
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: scan
+        scan:
+          topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 2.0  # 장애물에서 멀어질수록 위험도(Cost)가 얼마나 빨리 줄어들지 결정하는 팽창 계수. 값이 작을수록 위험도가 넓고 부드럽게 퍼져서 로봇이 먼 곳부터 스무스하게 피함. (값이 크면 벽에 바짝 다가가서야 급격하게 피함)
+        inflation_radius: 1.0  # 장애물 주변으로 뿜어져 나오는 가상의 '안전거리(위험 구역)' 최대 반경. 값이 클수록 로봇이 먼 곳부터 장애물을 경계함.
+
+map_server:
+  ros__parameters:
+    use_sim_time: True
+    yaml_filename: ""
+
+lifecycle_manager:
+  ros__parameters:
+    use_sim_time: True
+    autostart: true
+    node_names: ['map_server', 'amcl', 'planner_server', 'controller_server', 'behavior_server', 'bt_navigator']
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: True
+    costmap_topic: local_costmap/costmap_raw
+    footprint_topic: local_costmap/published_footprint
+    cycle_frequency: 10.0
+
+    # 아커만 조향에서 불가능한 spin 플러그인 제거
+    behavior_plugins: ["spin", "backup", "drive_on_heading", "wait"]
+    spin:
+      plugin: "nav2_behaviors/Spin"
+    # behavior_plugins: ["backup", "drive_on_heading", "wait"]
+
+    backup:
+      plugin: "nav2_behaviors/BackUp"
+    drive_on_heading:
+      plugin: "nav2_behaviors/DriveOnHeading"
+    wait:
+      plugin: "nav2_behaviors/Wait"
+    global_frame: odom
+    robot_base_frame: base_link
+    transform_tolerance: 0.1

@@ -12,8 +12,10 @@ amcl:
     scan_topic: scan
     max_particles: 2000
     min_particles: 500
-    update_min_d: 0.1   
-    update_min_a: 0.1  
+    max_beams: 180    #. 맵 매칭에 사용하는 라이다 광선 수
+    laser_likelihood_max_dist: 3.5     #. 순간 오차가 크게 벌어져도 맵 벽을 찾아 매칭할 수 있는 최대 거리 
+    update_min_d: 0.05   
+    update_min_a: 0.05  
 
 bt_navigator:
   ros__parameters:
@@ -47,10 +49,90 @@ controller_server:
       xy_goal_tolerance: 0.25
       yaw_goal_tolerance: 0.25
 
+    # 🌟 MPPI (Model Predictive Path Integral) Controller 설정 (아커만 모드)
+    # FollowPath:
+    #   plugin: "nav2_mppi_controller::MPPIController"
+    #   time_steps: 35                 # 미래 예측 시간 스텝 (56 * 0.05s = 약 2.8초 앞 예측)
+    #   model_dt: 0.05                 # 시뮬레이션 시간 간격 (dt)
+    #   batch_size: 1000               # 샘플링할 가상 주행 궤적 개수 (CPU 부하에 따라 800~2000 조절)
+    #   iteration_count: 2             # 최적화 반복 횟수
+    #   vx_std: 0.4                    # 속도 샘플링 표준편차
+    #   vy_std: 0.0                    # Y축(옆으로 이동) 편차 (아커만은 0으로 고정)
+    #   wz_std: 0.4                    # 각속도(조향) 샘플링 표준편차
+    #   vx_max: 2.5                    # 최대 전진 속도 (m/s)
+    #   vx_min: -1.5                   # 최대 후진 속도 (m/s) - 후진 허용
+    #   vy_max: 0.0                    # Y축 속도 (아커만은 0)
+    #   wz_max: 2.0                    # 최대 각속도 (rad/s)
+    #   prune_distance: 1.0            # 지난 경로 정리 거리
+    #   transform_tolerance: 0.2
+    #   motion_model: "Ackermann"      # 🌟 아커만 조향 모션 모델 지정! (DiffDrive / Ackermann / Omni 지원)
+    #   visualize: false               # RViz로 수천 개의 샘플 궤적 시각화 여부 (디버깅용, CPU 절약 위해 false 권장)
+    #   # 🌟 Critics: 수천 개의 궤적 중 '최선의 궤적'을 고르는 채점 기준들
+    #   critics: [
+    #     "ConstraintCritic", 
+    #     "ObstaclesCritic", 
+    #     "GoalCritic", 
+    #     "GoalAngleCritic", 
+    #     "PathAlignCritic", 
+    #     "PathFollowCritic", 
+    #     "PathAngleCritic", 
+    #     "PreferForwardCritic"
+    #   ]
+    #   ConstraintCritic:              # 최대 가속도/속도 제한 준수 여부 채점
+    #     enabled: true
+    #     cost_power: 1
+    #     cost_weight: 4.0
+    #   ObstaclesCritic:               # 장애물 충돌 위험 채점 (충돌 시 매우 큰 벌점)
+    #     enabled: true
+    #     cost_power: 1
+    #     repulsion_weight: 0.5
+    #     critical_weight: 20.0
+    #     consider_footprint: true      # 로봇 차체 외곽선(Footprint) 충돌 검사
+    #     collision_cost: 10000.0
+    #     collision_margin_distance: 0.05
+    #     near_goal_distance: 0.5
+    #   GoalCritic:                    # 최종 목적지에 얼마나 가까워지는가
+    #     enabled: true
+    #     cost_power: 1
+    #     cost_weight: 5.0
+    #     threshold_to_consider: 1.4
+    #   GoalAngleCritic:               # 목표 지점 도착 시 목표 방향과 얼마나 일치하는가
+    #     enabled: true
+    #     cost_power: 1
+    #     cost_weight: 3.0
+    #     threshold_to_consider: 0.5
+    #   PathAlignCritic:               # 전역 경로(Global Path)의 모양을 얼마나 잘 따르는가
+    #     enabled: true
+    #     cost_power: 1
+    #     cost_weight: 3.0
+    #     max_path_occupancy_ratio: 0.05
+    #     trajectory_point_step: 3
+    #     threshold_to_consider: 0.5
+    #     offset_from_furthest: 20
+    #     use_path_orientations: false
+    #   PathFollowCritic:              # 전역 경로를 앞쪽으로 얼마나 진도(Progress)를 나가는가
+    #     enabled: true
+    #     cost_power: 1
+    #     cost_weight: 10.0
+    #     offset_from_furthest: 5
+    #     threshold_to_consider: 1.4
+    #   PathAngleCritic:               # 경로의 곡선 각도와 로봇 헤딩 각도의 일치도
+    #     enabled: true
+    #     cost_power: 1
+    #     cost_weight: 2.0
+    #     offset_from_furthest: 4
+    #     mode: 1                      #. 0(전진 전용)에서 1(전진/후진 양방향 허용)로 변경!
+    #     threshold_to_consider: 0.5
+    #   PreferForwardCritic:           # 웬만하면 후진보다 전진 주행을 선호하도록 유도
+    #     enabled: false               #. 후진 벌점 삭제. 후진 자유롭게 허용.
+    #     cost_power: 1
+    #     cost_weight: 5.0
+    #     threshold_to_consider: 0.5
+
     # 🌟 아커만 조향 전용 Regulated Pure Pursuit Controller 설정
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 1.4
+      desired_linear_vel: 1.5
       # 👇 시선을 멀리 두어 핸들을 부드럽게 꺾도록 수정 (미끄러짐 방지)
       lookahead_dist: 1.0           # 👈 (기존 0.8) 평상시 1.5m 앞을 보고 주행
       min_lookahead_dist: 0.7       # 👈 (기존 0.4) 아무리 느려도 최소 1m 앞은 보장! (이게 작으면 핸들을 확 꺾어버림)
@@ -67,8 +149,8 @@ controller_server:
       use_cost_regulated_linear_velocity_scaling: false # 로봇이 장애물 근처(Costmap의 위험 구역)에 진입했을 때 쫄아서 자동으로 속도를 줄이는 기능. 좁은 틈새를 지날 때 아예 멈춰버리는 원인이 되므로 false 권장.
       cost_scaling_dist: 0.6
       cost_scaling_factor: 10.0
-      regulated_linear_scaling_min_radius: 0.9
-      regulated_linear_scaling_min_speed: 0.1
+      regulated_linear_scaling_min_radius: 1.6
+      regulated_linear_scaling_min_speed: 0.8
       use_rotate_to_heading: false  # 👈 필수: 아커만 제자리 회전 시도 방지
       allow_reversing: true           # 👈 후진 궤적을 따라 뒤로 갈 수 있도록 허용!
 
@@ -131,8 +213,8 @@ local_costmap:
           data_type: "LaserScan"
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 2.0  # 장애물에서 멀어질수록 위험도(Cost)가 얼마나 빨리 줄어들지 결정하는 팽창 계수. 값이 작을수록 위험도가 넓고 부드럽게 퍼져서 로봇이 먼 곳부터 스무스하게 피함. (값이 크면 벽에 바짝 다가가서야 급격하게 피함)
-        inflation_radius: 1.0 # 장애물 주변으로 뿜어져 나오는 가상의 '안전거리(위험 구역)' 최대 반경. 값이 클수록 로봇이 먼 곳부터 장애물을 경계함.
+        cost_scaling_factor: 4.0  # 장애물에서 멀어질수록 위험도(Cost)가 얼마나 빨리 줄어들지 결정하는 팽창 계수. 값이 작을수록 위험도가 넓고 부드럽게 퍼져서 로봇이 먼 곳부터 스무스하게 피함. (값이 크면 벽에 바짝 다가가서야 급격하게 피함)
+        inflation_radius: 0.6 # 장애물 주변으로 뿜어져 나오는 가상의 '안전거리(위험 구역)' 최대 반경. 값이 클수록 로봇이 먼 곳부터 장애물을 경계함.
 
 global_costmap:
   global_costmap:
