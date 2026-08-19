@@ -58,6 +58,8 @@ sudo apt install -y \
 
 #### 📌 센서 정의 기본 소스코드 (3D-LiDAR & Camera)
 
+* **적용 파일 위치:** `ros2_ws/src/hunter_robot/hunter_description/description/sensors.xacro` 신규 생성 및 `hunter.urdf.xacro`에 include 추가.
+
 ##### 1) 3D-LiDAR 센서 (Velodyne VLP-16 3D PointCloud)
 * **설치 위치:** 차체 상단 (`base_link` 기준 Z: +0.35m, X: +0.1m)
 * **발행 토픽:** `/points_raw` (`sensor_msgs/msg/PointCloud2`, Frame ID: `velodyne_link`)
@@ -191,9 +193,6 @@ sudo apt install -y \
   </sensor>
 </gazebo>
 ```
-
-* **적용 파일 위치:** `ros2_ws/src/hunter_robot/hunter_description/description/sensors.xacro` 신규 생성 및 `hunter.urdf.xacro`에 include 추가.
-
 ---
 
 ### 3.3. [Step 2.3] 아커만 전용 컨트롤러 구축 (`ackermann_controllers.yaml`) 🌟
