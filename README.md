@@ -120,10 +120,10 @@ sudo apt install -y \
 
 ## 5. Create the 2d-map(지도 생성 필요 시)
 ```bash
-# 1. [터미널 1] ros2_ws 이동
+# 1. ros2_ws 이동
 cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
 
-# 2. SLAM 통합 런치 실행
+# 2. [터미널 1] SLAM 통합 런치 실행
 source install/setup.bash
 ros2 launch hunter_gazebo slam_mapping.launch.py
 

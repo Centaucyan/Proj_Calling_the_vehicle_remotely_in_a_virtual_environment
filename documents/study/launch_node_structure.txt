@@ -21,3 +21,17 @@
 
 
 2. view_hunter.rviz
+
+# Create the 2d-map
+1. slam_mapping.launch.py
+  * launch_sim.launch.py [hunter_gazebo]
+    - rsp.launch.py [hunter_description]
+      : robot_state_publisher [robot_state_publisher]
+    - gazebo.launch.py [gazebo_ros]
+    - spawn_entity.py [gazebo_ros (-topic, robot_description, -entity, hunter_gazebo)]
+    - spawner [controller_manager (ackermann_steering_controller)]
+    - spawner [controller_manager (joint_state_broadcaster)]
+
+  * async_slam_toolbox_node [slam_toolbox]
+
+  * pointcloud_to_laserscan_node [pointcloud_to_laserscan]
