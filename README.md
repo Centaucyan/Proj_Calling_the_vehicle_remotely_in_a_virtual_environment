@@ -118,7 +118,30 @@ sudo apt install -y \
 | | `ros-humble-nav2-bringup` | Nav2 프레임워크의 여러 노드를 한 번에 구동하고 관리하는 공식 Bringup 런치 스크립트 및 템플릿 |
 ---
 
-## 5. Execute Commands
+## 5. Create the 2d-map(지도 생성 필요 시)
+```bash
+# 1. [터미널 1] ros2_ws 이동
+cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
+
+# 2. SLAM 통합 런치 실행
+source install/setup.bash
+ros2 launch hunter_gazebo slam_mapping.launch.py
+
+# 3. [터미널 2] RViz2 구동 및 실시간 2D 지도 시각화
+source install/setup.bash
+rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
+
+# 4. [터미널 3] 키보드 제어로 주차장 전체 구역 조종 주행
+source install/setup.bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+# 5. [터미널 4] 완성된 2D 지도 저장 (주행 완료 후)
+source install/setup.bash
+ros2 run nav2_map_server map_saver_cli -f src/hunter_robot/hunter_gazebo/maps/parking_garage_map
+```
+---
+
+## 6. Execute Commands
 ```bash
 # 1. ros2_ws 이동
 cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
@@ -153,8 +176,9 @@ rviz2 -d src/hunter_robot/hunter_gazebo/config/view_hunter.rviz
 source install/setup.bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
+---
 
-## 6. Reference
+## 7. Reference
 * **Github Repository:** 
   * https://github.com/LCAS/hunter_robot.git
   * https://github.com/agilexrobotics/ugv_sdk.git
