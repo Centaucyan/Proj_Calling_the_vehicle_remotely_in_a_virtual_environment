@@ -190,6 +190,6 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
   * https://control.ros.org/humble/index.html/
 ---
 
-## 7. ROS2 노드 구성도 (아키텍처)
+## 8. ROS2 노드 구성도 (아키텍처)
 ![Node Architecture](./documents/images/ROS2_node_structure.png)
 ---
