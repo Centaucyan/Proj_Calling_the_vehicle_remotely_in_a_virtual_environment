@@ -71,6 +71,28 @@ AgileX Hunter의 센서 프레임(`base_link`, `odom`, `/scan`)에 맞춰 `slam_
 * **파일 위치:** `ros2_ws/src/hunter_robot/hunter_gazebo/config/mapper_params_online_async.yaml`
 
 ```yaml
+# ==============================================================================
+# 1. PointCloud -> LaserScan 변환 노드 파라미터
+# ==============================================================================
+pointcloud_to_laserscan:
+  ros__parameters:
+    target_frame: "velodyne_link"
+    transform_tolerance: 0.01
+    # 🌟 바닥(Z=0)이 스캔에 포함되어 장애물(검은색)로 인식되는 것을 막기 위해 상향 조정 (LiDAR Z=0.35)
+    min_height: -0.1
+    max_height: 1.0
+    angle_min: -3.14159
+    angle_max: 3.14159
+    angle_increment: 0.0087
+    scan_time: 0.1
+    range_min: 0.3
+    range_max: 20.0
+    use_sim_time: true
+
+
+# ==============================================================================
+# 2. SLAM Toolbox 노드 파라미터
+# ==============================================================================
 slam_toolbox:
   ros__parameters:
     # Solver settings (ROS 2 Humble 표준 CeresSolver 사용)
