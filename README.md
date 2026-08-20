@@ -15,17 +15,14 @@
     * navigation2
     * nav2-bringup
     
-<!-- <video autoplay muted loop controls width="100%">
-  <source src="./documents/videos/autonomous_navigation_01.webm" type="video/webm">
-</video> -->
 ![Autonomous Navigation](./documents/videos/autonomous_navigation_01.gif)
-<!-- ![GNav](./documents/images/hunter_in_gazebo.png)
-![Rviz2](./documents/images/hunter_in_rviz2.png)
-![Slam](./documents/images/slam_in_rviz2.png)
-![Slam](./documents/images/slam_complete.png) -->
 ---
 
-## 2. Environment
+## 2. DFD(Data Flow Diagram)
+![Node Architecture](./documents/images/data_flow_diagram.png)
+---
+
+## 3. Environment
 * **OS:** `Ubuntu 22.04 LTS(Jammy Jellyfish)`
 * **Language:** `C++, Python(Ver: 3.10)`
 * **Middle ware:** `ROS 2 Humble Hawksbill`
@@ -36,11 +33,11 @@
   - **곡선 모션 모델 (`Reeds-Shepp`)**: 전진과 후진을 모두 고려한 곡선을 생성하여 좁은 공간이나 코너에서도 탈출 경로 계획 가능. *(참고: 전진 전용은 Dubins 모델)*
 ---
 
-## 3. 저장소 클론 및 서브모듈(Submodule) 다운로드 가이드
+## 4. 저장소 클론 및 서브모듈(Submodule) 다운로드 가이드
 
 다른 PC나 새로운 개발 환경에서 이 저장소를 클론할 때 외부 의존성 서브모듈(`ros2_ws/src/hunter_ros2` 등)을 함께 내려받는 2가지 방법.
 
-### 3.1. [방법 1] 저장소 클론 시 서브모듈 한 번에 내려받기 (추천 🌟)
+### 4.1. [방법 1] 저장소 클론 시 서브모듈 한 번에 내려받기 (추천 🌟)
 `--recurse-submodules` 옵션을 사용하면 메인 저장소와 연결된 모든 서브모듈을 한 번에 자동으로 클론함.
 
 ```bash
@@ -48,7 +45,7 @@ git clone --recurse-submodules https://github.com/Centaucyan/Proj_Calling_the_ve
 cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment
 ```
 
-### 3.2. [방법 2] 일반 `git clone` 후 서브모듈 별도 동기화하기
+### 4.2. [방법 2] 일반 `git clone` 후 서브모듈 별도 동기화하기
 이미 `git clone`을 실행했거나 서브모듈이 다운로드되지 않아 폴더가 비어있는 경우 서브모듈을 초기화하고 수동으로 내려받음.
 
 ```bash
@@ -61,7 +58,7 @@ git submodule update --init --recursive
 ```
 ---
 
-## 4. Pre-installation
+## 5. Pre-installation
 
 본 프로젝트 실행에 필요한 ROS 2 Humble 및 시뮬레이션 의존성 패키지 일괄 설치 명령과 주요 패키지별 상세 역할 구분입니다.
 
@@ -118,7 +115,7 @@ sudo apt install -y \
 | | `ros-humble-nav2-bringup` | Nav2 프레임워크의 여러 노드를 한 번에 구동하고 관리하는 공식 Bringup 런치 스크립트 및 템플릿 |
 ---
 
-## 5. Create the 2d-map(지도 생성 필요 시)
+## 6. Create the 2d-map(지도 생성 필요 시)
 ```bash
 # 1. ros2_ws 이동
 cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
@@ -141,7 +138,7 @@ ros2 run nav2_map_server map_saver_cli -f src/hunter_robot/hunter_gazebo/maps/pa
 ```
 ---
 
-## 6. Execute Commands
+## 7. Execute Commands
 ```bash
 # 1. ros2_ws 이동
 cd Proj_Calling_the_vehicle_remotely_in_a_virtual_environment/ros2_ws
@@ -178,7 +175,7 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 ---
 
-## 7. Reference
+## 8. Reference
 * **Github Repository:** 
   * https://github.com/LCAS/hunter_robot.git
   * https://github.com/agilexrobotics/ugv_sdk.git
@@ -188,8 +185,4 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
   * https://docs.nav2.org/index.html
   * https://index.ros.org/p/nav2_bringup/
   * https://control.ros.org/humble/index.html/
----
-
-## 8. ROS2 노드 구성도 (아키텍처)
-![Node Architecture](./documents/images/ROS2_node_structure.png)
 ---
